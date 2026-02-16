@@ -4,13 +4,13 @@ import React, { useState } from 'react';
 import { useRamadanStore, DailyPrayers } from '@/store/store';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { CheckCircle2, Circle, Plus, Trash2, Clock, BookOpen, Utensils, Heart } from 'lucide-react';
+import { CheckCircle2, Plus, Trash2, Clock, BookOpen, Utensils, Heart } from 'lucide-react';
 
 export const NotebookPlanner: React.FC = () => {
     const {
         currentDay, tasks, addTask, toggleTask, deleteTask,
         prayers, updatePrayerStatus, meals, updateMeal,
-        dailyPages, updateDailyPages
+        dailyPages, updateDailyPages, fetchTimings, userCity
     } = useRamadanStore();
 
     const [newTaskText, setNewTaskText] = useState('');
@@ -68,7 +68,7 @@ export const NotebookPlanner: React.FC = () => {
                                     className="bg-transparent text-right font-black text-2xl w-20 focus:outline-none focus:text-primary transition-colors"
                                 />
                             </div>
-                            <p className="text-xs text-muted-foreground font-medium italic">"The Quran is a guidance for mankind and clear proofs for the guidance and the criterion."</p>
+                            <p className="text-xs text-muted-foreground font-medium italic">&quot;The Quran is a guidance for mankind and clear proofs for the guidance and the criterion.&quot;</p>
                         </div>
                     </div>
 
@@ -158,34 +158,44 @@ export const NotebookPlanner: React.FC = () => {
                         </div>
                     </Card>
 
-                    {/* Meal Planning */}
                     <div className="space-y-6">
                         <h2 className="text-3xl font-black flex items-center gap-3 italic">
                             <Utensils className="w-8 h-8 text-secondary" />
-                            Meal Planning
+                            Blessings
                         </h2>
-                        <div className="rounded-3xl overflow-hidden border-2 border-secondary/20 shadow-xl bg-white shadow-secondary/5">
-                            <div className="flex">
-                                <div className="w-1/3 bg-secondary p-6 flex items-center justify-center font-black text-xl text-[#3e2723]">Suhur</div>
-                                <div className="w-2/3 p-4">
-                                    <textarea
-                                        className="w-full h-full bg-transparent border-none focus:outline-none resize-none font-bold text-muted-foreground placeholder:italic p-2"
-                                        placeholder="Planned healthy meal..."
-                                        value={dayMeals.suhoor}
-                                        onChange={(e) => updateMeal(currentDay, 'suhoor', e.target.value)}
-                                    />
-                                </div>
+                        <div className="flex justify-end -mt-10 mb-2">
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => fetchTimings(currentDay)}
+                                className="text-[10px] font-black tracking-widest text-[#8d6e63] hover:text-[#4a342e] flex items-center gap-1.5"
+                            >
+                                <Clock className="w-3 h-3" />
+                                SYNC PRAYER TIMES ({userCity})
+                            </Button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="rounded-3xl border-2 border-secondary/20 shadow-xl bg-white p-6 flex flex-col items-center justify-center gap-2 group hover:border-secondary transition-all">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8d6e63]">Suhoor</div>
+                                <div className="text-2xl font-black text-[#4a342e]">{dayMeals.suhoor || '--:--'}</div>
+                                <textarea
+                                    className="w-full mt-2 bg-transparent border-t border-secondary/10 focus:outline-none resize-none font-bold text-xs text-muted-foreground placeholder:italic text-center pt-2"
+                                    placeholder="Meal plan..."
+                                    rows={2}
+                                    value={dayMeals.suhoor}
+                                    onChange={(e) => updateMeal(currentDay, 'suhoor', e.target.value)}
+                                />
                             </div>
-                            <div className="flex border-t-2 border-secondary/10">
-                                <div className="w-1/3 bg-[#ffe0b2] p-6 flex items-center justify-center font-black text-xl text-[#3e2723]">Iftar</div>
-                                <div className="w-2/3 p-4">
-                                    <textarea
-                                        className="w-full h-full bg-transparent border-none focus:outline-none resize-none font-bold text-muted-foreground placeholder:italic p-2"
-                                        placeholder="Iftar favorites..."
-                                        value={dayMeals.iftar}
-                                        onChange={(e) => updateMeal(currentDay, 'iftar', e.target.value)}
-                                    />
-                                </div>
+                            <div className="rounded-3xl border-2 border-secondary/20 shadow-xl bg-white p-6 flex flex-col items-center justify-center gap-2 group hover:border-secondary transition-all">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8d6e63]">Iftar</div>
+                                <div className="text-2xl font-black text-[#4a342e]">{dayMeals.iftar || '--:--'}</div>
+                                <textarea
+                                    className="w-full mt-2 bg-transparent border-t border-secondary/10 focus:outline-none resize-none font-bold text-xs text-muted-foreground placeholder:italic text-center pt-2"
+                                    placeholder="Meal plan..."
+                                    rows={2}
+                                    value={dayMeals.iftar}
+                                    onChange={(e) => updateMeal(currentDay, 'iftar', e.target.value)}
+                                />
                             </div>
                         </div>
                     </div>

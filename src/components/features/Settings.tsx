@@ -5,7 +5,7 @@ import { useRamadanStore } from '@/store/store';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
-import { Download, Trash2, Calendar as CalendarIcon, Bell, Upload, Plus, Clock, ShieldCheck, Volume2 } from 'lucide-react';
+import { Download, Trash2, Calendar as CalendarIcon, Bell, Upload, Plus, Clock, Volume2 } from 'lucide-react';
 import { useNotifications } from '../providers/NotificationProvider';
 
 export const Settings: React.FC = () => {
@@ -13,7 +13,8 @@ export const Settings: React.FC = () => {
         ramadanStartDate, setRamadanStartDate, resetAllData, exportData,
         importData, alarms, addAlarm, toggleAlarm, deleteAlarm,
         notificationsEnabled, setNotificationsEnabled,
-        selectedSound, setSelectedSound, customSounds, addCustomSound
+        selectedSound, setSelectedSound, customSounds, addCustomSound,
+        userCity, userCountry, setLocation, fetchTimings, meals, currentDay
     } = useRamadanStore();
 
     const { requestPermission } = useNotifications();
@@ -76,6 +77,62 @@ export const Settings: React.FC = () => {
                         onChange={(e) => setRamadanStartDate(e.target.value)}
                         className="w-full px-5 py-4 rounded-2xl border-2 border-border bg-[#fdfcf0] focus:border-primary focus:outline-none font-black text-[#4a342e] shadow-inner"
                     />
+                </Card>
+
+                <Card className="flex flex-col gap-4 bg-white shadow-xl">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="p-3 bg-primary/10 rounded-2xl text-primary">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-black text-[#4a342e]">Location Settings</h3>
+                    </div>
+                    <p className="text-sm text-[#8d6e63] font-bold px-1 opacity-70">
+                        Set your city and country to get accurate prayer timings.
+                    </p>
+                    <div className="space-y-4">
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-[#8d6e63] ml-1">City</label>
+                            <input
+                                type="text"
+                                value={userCity}
+                                onChange={(e) => setLocation(e.target.value, userCountry)}
+                                placeholder="Enter City"
+                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-[#fdfcf0] focus:border-primary focus:outline-none font-black text-[#4a342e] shadow-inner"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-[#8d6e63] ml-1">Country</label>
+                            <input
+                                type="text"
+                                value={userCountry}
+                                onChange={(e) => setLocation(userCity, e.target.value)}
+                                placeholder="Enter Country"
+                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-[#fdfcf0] focus:border-primary focus:outline-none font-black text-[#4a342e] shadow-inner"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="pt-4 space-y-4">
+                        <Button
+                            onClick={() => fetchTimings(currentDay)}
+                            className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-[#4a342e] hover:bg-white shadow-lg"
+                        >
+                            <Clock className="w-4 h-4 mr-2" /> GET TIMINGS
+                        </Button>
+
+                        {meals[currentDay] && (meals[currentDay].suhoor || meals[currentDay].iftar) && (
+                            <div className="grid grid-cols-2 gap-4 bg-[#fdfcf0] p-4 rounded-2xl border-2 border-dashed border-secondary/30">
+                                <div className="text-center">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">Suhur</div>
+                                    <div className="text-lg font-black text-[#4a342e]">{meals[currentDay].suhoor || '--:--'}</div>
+                                </div>
+                                <div className="text-center border-l-2 border-secondary/20">
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">Iftar</div>
+                                    <div className="text-lg font-black text-[#4a342e]">{meals[currentDay].iftar || '--:--'}</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </Card>
 
                 <Card className="flex flex-col gap-4 bg-white shadow-xl">

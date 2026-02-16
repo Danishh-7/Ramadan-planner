@@ -78,6 +78,8 @@ interface RamadanStore {
     currentDay: number;
     theme: 'light' | 'dark';
     notificationsEnabled: boolean;
+    userCity: string;
+    userCountry: string;
 
     // Daily Activities (30 days)
     prayers: Record<number, DailyPrayers>;
@@ -105,6 +107,8 @@ interface RamadanStore {
     setCurrentDay: (day: number) => void;
     setTheme: (theme: 'light' | 'dark') => void;
     setNotificationsEnabled: (enabled: boolean) => void;
+    setLocation: (city: string, country: string) => void;
+    fetchTimings: (day: number) => Promise<void>;
 
     // Activity Actions
     updatePrayerStatus: (day: number, prayer: keyof DailyPrayers, status: PrayerStatus | boolean) => void;
@@ -174,6 +178,8 @@ export const useRamadanStore = create<RamadanStore>()(
             currentDay: 1,
             theme: 'light',
             notificationsEnabled: true,
+            userCity: 'Dadri',
+            userCountry: 'India',
             prayers: {},
             fasting: {},
             tasks: {},
@@ -194,6 +200,24 @@ export const useRamadanStore = create<RamadanStore>()(
             setCurrentDay: (day) => set({ currentDay: day }),
             setTheme: (theme) => set({ theme }),
             setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+            setLocation: (city, country) => set({ userCity: city, userCountry: country }),
+
+            fetchTimings: async (day) => {
+                const { userCity, userCountry } = get();
+                const { getSehriIftarTimings } = await import('@/services/aladhanApi');
+                const timings = await getSehriIftarTimings(userCity, userCountry);
+                if (timings) {
+                    set((state) => ({
+                        meals: {
+                            ...state.meals,
+                            [day]: {
+                                suhoor: timings.sehri,
+                                iftar: timings.iftar
+                            }
+                        }
+                    }));
+                }
+            },
 
             updatePrayerStatus: (day, prayer, status) => {
                 set((state) => ({ prayers: { ...state.prayers, [day]: { ...(state.prayers[day] || defaultPrayers), [prayer]: status } } }));
