@@ -6,6 +6,7 @@ import { Card } from '../ui/Card';
 import { ProgressBar } from '../ui/ProgressBar';
 import { CheckCircle2, BookOpen, Heart, Calendar, Trophy, Zap } from 'lucide-react';
 import { ProgressHeart } from '../ui/ProgressHeart';
+import { Clock } from '../ui/Clock';
 
 export const Dashboard: React.FC = () => {
     const { currentDay, prayers = {}, fasting = {}, juzCompleted = [], dailyPages = {}, habits = {}, tasks = {} } = useRamadanStore();
@@ -121,6 +122,10 @@ export const Dashboard: React.FC = () => {
                             </div>
                         </div>
                     </Card>
+                </div>
+
+                <div className="h-full">
+                    <Clock />
                 </div>
             </div>
 

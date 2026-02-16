@@ -174,7 +174,7 @@ const defaultChallenges: Challenge[] = Array.from({ length: 30 }, (_, i) => ({
 export const useRamadanStore = create<RamadanStore>()(
     persist(
         (set, get) => ({
-            ramadanStartDate: new Date().toISOString().split('T')[0],
+            ramadanStartDate: '2026-02-16',
             currentDay: 1,
             theme: 'light',
             notificationsEnabled: true,
