@@ -61,21 +61,21 @@ export const Settings: React.FC = () => {
 
             {/* Ramadan Configuration */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="flex flex-col gap-4 bg-white shadow-xl">
+                <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-3 bg-primary/10 rounded-2xl text-primary">
                             <CalendarIcon className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-black text-[#4a342e]">Ramadan Start Date</h3>
+                        <h3 className="text-xl font-black text-card-foreground">Ramadan Start Date</h3>
                     </div>
-                    <p className="text-sm text-[#8d6e63] font-bold px-1 opacity-70">
+                    <p className="text-sm text-muted-foreground font-bold px-1 opacity-70">
                         Ensures your 30-day tracking aligns with the lunar calendar.
                     </p>
                     <input
                         type="date"
                         value={ramadanStartDate}
                         onChange={(e) => setRamadanStartDate(e.target.value)}
-                        className="w-full px-5 py-4 rounded-2xl border-2 border-border bg-[#fdfcf0] focus:border-primary focus:outline-none font-black text-[#4a342e] shadow-inner"
+                        className="w-full px-5 py-4 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner"
                     />
                 </Card>
 
@@ -101,13 +101,23 @@ export const Settings: React.FC = () => {
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-[#8d6e63] ml-1">Country</label>
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">City</label>
+                            <input
+                                type="text"
+                                value={userCity}
+                                onChange={(e) => setLocation(e.target.value, userCountry)}
+                                placeholder="Enter City"
+                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Country</label>
                             <input
                                 type="text"
                                 value={userCountry}
                                 onChange={(e) => setLocation(userCity, e.target.value)}
                                 placeholder="Enter Country"
-                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-[#fdfcf0] focus:border-primary focus:outline-none font-black text-[#4a342e] shadow-inner"
+                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner"
                             />
                         </div>
                     </div>
@@ -115,46 +125,46 @@ export const Settings: React.FC = () => {
                     <div className="pt-4 space-y-4">
                         <Button
                             onClick={() => fetchTimings(currentDay)}
-                            className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-[#4a342e] hover:bg-white shadow-lg"
+                            className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-secondary-foreground hover:bg-card shadow-lg"
                         >
                             <Clock className="w-4 h-4 mr-2" /> GET TIMINGS
                         </Button>
 
                         {meals[currentDay] && (meals[currentDay].suhoor || meals[currentDay].iftar) && (
-                            <div className="grid grid-cols-2 gap-4 bg-[#fdfcf0] p-4 rounded-2xl border-2 border-dashed border-secondary/30">
+                            <div className="grid grid-cols-2 gap-4 bg-background p-4 rounded-2xl border-2 border-dashed border-secondary/30">
                                 <div className="text-center">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">Suhur</div>
-                                    <div className="text-lg font-black text-[#4a342e]">{meals[currentDay].suhoor || '--:--'}</div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Suhur</div>
+                                    <div className="text-lg font-black text-foreground">{meals[currentDay].suhoor || '--:--'}</div>
                                 </div>
                                 <div className="text-center border-l-2 border-secondary/20">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-[#8d6e63]">Iftar</div>
-                                    <div className="text-lg font-black text-[#4a342e]">{meals[currentDay].iftar || '--:--'}</div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Iftar</div>
+                                    <div className="text-lg font-black text-foreground">{meals[currentDay].iftar || '--:--'}</div>
                                 </div>
                             </div>
                         )}
                     </div>
                 </Card>
 
-                <Card className="flex flex-col gap-4 bg-white shadow-xl">
+                <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-3 bg-secondary/10 rounded-2xl text-secondary">
                             <Bell className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-black text-[#4a342e]">Reminders & Notifications</h3>
+                        <h3 className="text-xl font-black text-card-foreground">Reminders & Notifications</h3>
                     </div>
 
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between bg-[#fdfcf0] p-5 rounded-2xl border border-border/40 shadow-inner">
+                        <div className="flex items-center justify-between bg-background p-5 rounded-2xl border border-border/40 shadow-inner">
                             <div>
-                                <div className="font-black text-[#4a342e] text-sm">Browser Notifications</div>
-                                <div className="text-[10px] text-[#8d6e63] font-black uppercase tracking-wider">Get alerts for tasks</div>
+                                <div className="font-black text-foreground text-sm">Browser Notifications</div>
+                                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-wider">Get alerts for tasks</div>
                             </div>
                             <div className="flex gap-4 items-center">
-                                <Button size="sm" variant="ghost" onClick={requestPermission} className="rounded-xl text-[10px] font-black h-9 border-2 border-border hover:bg-white px-4">
+                                <Button size="sm" variant="ghost" onClick={requestPermission} className="rounded-xl text-[10px] font-black h-9 border-2 border-border hover:bg-card px-4">
                                     ENABLE
                                 </Button>
                                 <button onClick={() => setNotificationsEnabled(!notificationsEnabled)} className={`w-12 h-7 rounded-full transition-colors relative shadow-inner ${notificationsEnabled ? 'bg-completed' : 'bg-muted'}`}>
-                                    <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-sm ${notificationsEnabled ? 'left-6' : 'left-1'}`} />
+                                    <div className={`absolute top-1 w-5 h-5 bg-card rounded-full transition-all shadow-sm ${notificationsEnabled ? 'left-6' : 'left-1'}`} />
                                 </button>
                             </div>
                         </div>
@@ -164,14 +174,14 @@ export const Settings: React.FC = () => {
                                 <p className="text-xs text-muted-foreground italic font-medium px-2 py-4">No alarms set yet...</p>
                             ) : (
                                 alarms.map(alarm => (
-                                    <div key={alarm.id} className="flex items-center justify-between bg-white p-4 rounded-xl border-2 border-border/40 hover:border-secondary/30 transition-all group">
+                                    <div key={alarm.id} className="flex items-center justify-between bg-card p-4 rounded-xl border-2 border-border/40 hover:border-secondary/30 transition-all group">
                                         <div>
-                                            <div className="text-sm font-black text-[#4a342e]">{alarm.type}</div>
-                                            <div className="text-xs font-bold text-[#8d6e63]">{alarm.time}</div>
+                                            <div className="text-sm font-black text-foreground">{alarm.type}</div>
+                                            <div className="text-xs font-bold text-muted-foreground">{alarm.time}</div>
                                         </div>
                                         <div className="flex gap-3">
                                             <button onClick={() => toggleAlarm(alarm.id)} className={`w-10 h-6 rounded-full transition-colors relative shadow-inner ${alarm.enabled ? 'bg-completed' : 'bg-muted'}`}>
-                                                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${alarm.enabled ? 'left-5' : 'left-1'}`} />
+                                                <div className={`absolute top-1 w-4 h-4 bg-card rounded-full transition-all ${alarm.enabled ? 'left-5' : 'left-1'}`} />
                                             </button>
                                             <button onClick={() => deleteAlarm(alarm.id)} className="text-missed opacity-40 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
                                         </div>
@@ -179,28 +189,27 @@ export const Settings: React.FC = () => {
                                 ))
                             )}
                         </div>
-                        <Button onClick={() => setShowAddAlarm(true)} className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-[#4a342e] text-white hover:bg-secondary hover:text-[#4a342e] shadow-lg">
+                        <Button onClick={() => setShowAddAlarm(true)} className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-foreground text-background hover:bg-secondary hover:text-secondary-foreground shadow-lg">
                             <Plus className="w-4 h-4 mr-2" /> ADD REMINDER
                         </Button>
                     </div>
                 </Card>
 
                 {/* Sound Selection */}
-                <Card className="flex flex-col gap-4 bg-white shadow-xl">
+                <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-3 bg-secondary/10 rounded-2xl text-secondary">
                             <Volume2 className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-black text-[#4a342e]">Alarm Sound</h3>
+                        <h3 className="text-xl font-black text-card-foreground">Alarm Sound</h3>
                     </div>
 
                     <div className="space-y-4 flex-1 flex flex-col">
                         <div className="grid grid-cols-1 gap-2 flex-1">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8d6e63] ml-1">Sound Gallery</label>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Sound Gallery</label>
                             <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                                 {[
-                                    { id: 'beep', name: 'Digital Beep' },
-                                    { id: 'siren', name: 'Emergency Siren' },
+
                                     { id: 'adhan', name: 'Fajr Adhan' },
                                     { id: 'nasheed', name: 'Soft Nasheed' },
                                     ...customSounds
@@ -209,8 +218,8 @@ export const Settings: React.FC = () => {
                                         key={sound.id}
                                         onClick={() => setSelectedSound(sound.id)}
                                         className={`flex items-center justify-between px-4 py-4 rounded-xl border-2 transition-all shadow-sm ${selectedSound === sound.id
-                                            ? 'border-secondary bg-secondary/5 text-[#4a342e] font-black'
-                                            : 'border-border bg-[#fdfcf0] text-[#8d6e63] font-bold hover:border-secondary/40'
+                                            ? 'border-secondary bg-secondary/5 text-foreground font-black'
+                                            : 'border-border bg-background text-muted-foreground font-bold hover:border-secondary/40'
                                             }`}
                                     >
                                         <span className="text-[10px] uppercase truncate mr-1">{sound.name}</span>
@@ -221,10 +230,10 @@ export const Settings: React.FC = () => {
                         </div>
 
                         <div className="pt-2 border-t border-dotted border-border mt-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8d6e63] ml-1 block mb-3">Upload Custom</label>
-                            <label className="flex items-center justify-center gap-3 px-4 py-8 rounded-2xl border-2 border-dashed border-border hover:border-secondary transition-all cursor-pointer group bg-[#fdfcf0] shadow-inner">
-                                <Plus className="w-5 h-5 text-[#8d6e63] group-hover:text-secondary group-hover:scale-110 transition-transform" />
-                                <span className="text-[10px] font-black tracking-[0.15em] text-[#8d6e63] group-hover:text-secondary uppercase">AUDIO FILE (MP3/WAV)</span>
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1 block mb-3">Upload Custom</label>
+                            <label className="flex items-center justify-center gap-3 px-4 py-8 rounded-2xl border-2 border-dashed border-border hover:border-secondary transition-all cursor-pointer group bg-background shadow-inner">
+                                <Plus className="w-5 h-5 text-muted-foreground group-hover:text-secondary group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px] font-black tracking-[0.15em] text-muted-foreground group-hover:text-secondary uppercase">AUDIO FILE (MP3/WAV)</span>
                                 <input
                                     type="file"
                                     accept="audio/*"
@@ -247,27 +256,27 @@ export const Settings: React.FC = () => {
                 </Card>
 
                 {/* Data Backup */}
-                <Card className="flex flex-col gap-4 bg-white shadow-xl">
+                <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-3 bg-completed/10 rounded-2xl text-completed">
                             <Download className="w-6 h-6" />
                         </div>
-                        <h3 className="text-xl font-black text-[#4a342e]">Cloud Backup</h3>
+                        <h3 className="text-xl font-black text-card-foreground">Cloud Backup</h3>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
-                        <div className="bg-[#fdfcf0] p-6 rounded-2xl border-2 border-dashed border-border/60 space-y-4 shadow-inner">
-                            <p className="text-xs text-[#8d6e63] font-black uppercase tracking-widest leading-relaxed">Safety first: Keep your spiritual progress backed up locally.</p>
-                            <Button variant="ghost" onClick={handleExport} className="w-full rounded-xl font-black py-7 border-2 border-border bg-white hover:bg-completed hover:text-white hover:border-completed transition-all shadow-sm">
+                        <div className="bg-background p-6 rounded-2xl border-2 border-dashed border-border/60 space-y-4 shadow-inner">
+                            <p className="text-xs text-muted-foreground font-black uppercase tracking-widest leading-relaxed">Safety first: Keep your spiritual progress backed up locally.</p>
+                            <Button variant="ghost" onClick={handleExport} className="w-full rounded-xl font-black py-7 border-2 border-border bg-card hover:bg-completed hover:text-white hover:border-completed transition-all shadow-sm">
                                 <Download className="w-5 h-5 mr-2" /> EXPORT JSON
                             </Button>
                         </div>
 
-                        <div className="bg-[#fdfcf0] p-6 rounded-2xl border-2 border-dashed border-border/60 space-y-4 shadow-inner">
-                            <p className="text-xs text-[#8d6e63] font-black uppercase tracking-widest leading-relaxed">Returning after a break? Restore your journey here.</p>
+                        <div className="bg-background p-6 rounded-2xl border-2 border-dashed border-border/60 space-y-4 shadow-inner">
+                            <p className="text-xs text-muted-foreground font-black uppercase tracking-widest leading-relaxed">Returning after a break? Restore your journey here.</p>
                             <label className="block">
                                 <input type="file" accept=".json" onChange={handleImport} className="hidden" id="import-input" />
-                                <Button variant="ghost" className="w-full rounded-xl font-black py-7 cursor-pointer border-2 border-border bg-white hover:bg-secondary hover:text-[#4a342e] hover:border-secondary transition-all shadow-sm" onClick={() => document.getElementById('import-input')?.click()}>
+                                <Button variant="ghost" className="w-full rounded-xl font-black py-7 cursor-pointer border-2 border-border bg-card hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all shadow-sm" onClick={() => document.getElementById('import-input')?.click()}>
                                     <Upload className="w-5 h-5 mr-2" /> IMPORT JSON
                                 </Button>
                             </label>

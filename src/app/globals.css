@@ -19,6 +19,33 @@
   --qadha: #ffb74d;
 }
 
+.dark {
+  --background: #1a1614;
+  /* Very dark brown/black */
+  --foreground: #ece0d1;
+  /* Light cream/beige */
+  --card: #2c2420;
+  /* Dark brown card bg */
+  --card-foreground: #ece0d1;
+  --primary: #a1887f;
+  /* Slightly lighter brown for primary */
+  --primary-foreground: #1a1614;
+  --secondary: #ffb74d;
+  /* Warm orange/gold */
+  --secondary-foreground: #1a1614;
+  --muted: #3e2723;
+  /* Muted background */
+  --muted-foreground: #a1887f;
+  /* Muted text */
+  --border: #4e342e;
+  /* Darker border */
+  --ring: #a1887f;
+  --completed: #66bb6a;
+  --missed: #ef5350;
+  --excused: #78909c;
+  --qadha: #ffa726;
+}
+
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -52,15 +79,15 @@
 }
 
 .notebook-paper {
-  background-color: #fdfcf0;
-  border: 1px solid rgba(215, 204, 200, 0.3);
+  background-color: var(--background);
+  border: 1px solid var(--border);
 }
 
 .islamic-pattern {
-  background-color: #fdfcf0;
+  background-color: var(--background);
   background-image:
-    radial-gradient(#d7ccc8 0.5px, transparent 0.5px),
-    radial-gradient(#d7ccc8 0.5px, #fdfcf0 0.5px);
+    radial-gradient(var(--border) 0.5px, transparent 0.5px),
+    radial-gradient(var(--border) 0.5px, var(--background) 0.5px);
   background-size: 20px 20px;
   background-position: 0 0, 10px 10px;
 }

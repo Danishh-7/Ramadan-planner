@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
 
             <aside
                 className={`
-          fixed lg:sticky top-0 left-0 h-screen bg-[#fdfcf0] border-r-2 border-dashed border-border/40
+          fixed lg:sticky top-0 left-0 h-screen bg-background border-r-2 border-dashed border-border/40
           w-72 flex flex-col z-40 transition-transform duration-300
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
@@ -81,12 +81,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                       w-full flex items-center gap-4 px-5 py-3 rounded-2xl
                       transition-all duration-300 font-bold group
                       ${isActive
-                                                ? 'bg-[#4a342e] text-white shadow-xl shadow-brown-900/20 translate-x-2'
+                                                ? 'bg-primary text-primary-foreground shadow-xl shadow-primary/20 translate-x-2'
                                                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1'
                                             }
                     `}
                                     >
-                                        <Icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-secondary' : 'text-primary/70'}`} />
+                                        <Icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-secondary' : 'text-foreground/70'}`} />
                                         <span className="tracking-tight">{item.label}</span>
                                         {isActive && <div className="ml-auto w-2 h-2 rounded-full bg-secondary shadow-lg" />}
                                     </button>

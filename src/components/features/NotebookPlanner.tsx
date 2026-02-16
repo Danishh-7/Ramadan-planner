@@ -50,7 +50,7 @@ export const NotebookPlanner: React.FC = () => {
                 {/* Left Column: Quran & Tasks */}
                 <div className="space-y-10">
                     {/* Quran Tracker */}
-                    <div className="notebook-border rounded-3xl p-8 space-y-6 bg-white/50 relative overflow-hidden group">
+                    <div className="notebook-border rounded-3xl p-8 space-y-6 bg-card/50 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <BookOpen className="w-16 h-16" />
                         </div>
@@ -73,8 +73,8 @@ export const NotebookPlanner: React.FC = () => {
                     </div>
 
                     {/* To-Do List */}
-                    <div className="bg-[#4a342e] text-white rounded-[2.5rem] p-8 shadow-2xl relative notebook-shadow border border-white/10">
-                        <h2 className="text-3xl font-black mb-8 border-b border-white/10 pb-4 tracking-tighter italic text-secondary/90">TO DO LIST</h2>
+                    <div className="bg-primary text-primary-foreground rounded-[2.5rem] p-8 shadow-2xl relative notebook-shadow border border-white/10">
+                        <h2 className="text-3xl font-black mb-8 border-b border-primary-foreground/10 pb-4 tracking-tighter italic text-secondary/90">TO DO LIST</h2>
 
                         <div className="space-y-4 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                             {dayTasks.length === 0 ? (
@@ -85,9 +85,9 @@ export const NotebookPlanner: React.FC = () => {
                                         <div className="flex items-center gap-4 flex-1">
                                             <button
                                                 onClick={() => toggleTask(currentDay, task.id)}
-                                                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-completed border-completed' : 'border-white/20 hover:border-white/40'}`}
+                                                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-completed border-completed' : 'border-primary-foreground/20 hover:border-primary-foreground/40'}`}
                                             >
-                                                {task.completed && <CheckCircle2 className="w-4 h-4 text-[#4a342e]" />}
+                                                {task.completed && <CheckCircle2 className="w-4 h-4 text-primary" />}
                                             </button>
                                             <div className="flex flex-col">
                                                 <span className={`font-bold transition-all ${task.completed ? 'line-through opacity-40' : 'text-white/90'}`}>{task.text}</span>
@@ -110,21 +110,21 @@ export const NotebookPlanner: React.FC = () => {
                             <div className="flex gap-2">
                                 <input
                                     placeholder="Add a new task..."
-                                    className="bg-white/10 border border-white/10 rounded-2xl px-5 py-4 flex-1 text-sm focus:ring-2 focus:ring-secondary/50 outline-none placeholder:text-white/40 font-bold text-white transition-all placeholder:italic"
+                                    className="bg-primary-foreground/10 border border-primary-foreground/10 rounded-2xl px-5 py-4 flex-1 text-sm focus:ring-2 focus:ring-secondary/50 outline-none placeholder:text-primary-foreground/40 font-bold text-primary-foreground transition-all placeholder:italic"
                                     value={newTaskText}
                                     onChange={(e) => setNewTaskText(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
                                 />
                                 <input
                                     type="time"
-                                    className="bg-white/10 border border-white/10 rounded-2xl px-3 py-4 w-24 text-center text-xs focus:ring-2 focus:ring-secondary/50 outline-none font-bold text-white transition-all"
+                                    className="bg-primary-foreground/10 border border-primary-foreground/10 rounded-2xl px-3 py-4 w-24 text-center text-xs focus:ring-2 focus:ring-secondary/50 outline-none font-bold text-primary-foreground transition-all"
                                     value={newTaskTime}
                                     onChange={(e) => setNewTaskTime(e.target.value)}
                                 />
                             </div>
                             <Button
                                 onClick={handleAddTask}
-                                className="w-full bg-secondary text-[#4a342e] hover:bg-white font-black rounded-2xl py-6 shadow-xl shadow-black/20 transition-all active:scale-[0.98]"
+                                className="w-full bg-secondary text-secondary-foreground hover:bg-card font-black rounded-2xl py-6 shadow-xl shadow-black/20 transition-all active:scale-[0.98]"
                             >
                                 <div className="flex items-center gap-2 ">
                                     <Plus className="w-5 h-5" />
@@ -159,25 +159,14 @@ export const NotebookPlanner: React.FC = () => {
                     </Card>
 
                     <div className="space-y-6">
-                        <h2 className="text-3xl font-black flex items-center gap-3 italic">
+                        <h2 className="text-3xl font-black flex items-center gap-3 italic mb-6">
                             <Utensils className="w-8 h-8 text-secondary" />
-                            Blessings
+                            Meal Plan
                         </h2>
-                        <div className="flex justify-end -mt-10 mb-2">
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => fetchTimings(currentDay)}
-                                className="text-[10px] font-black tracking-widest text-[#8d6e63] hover:text-[#4a342e] flex items-center gap-1.5"
-                            >
-                                <Clock className="w-3 h-3" />
-                                SYNC PRAYER TIMES ({userCity})
-                            </Button>
-                        </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="rounded-3xl border-2 border-secondary/20 shadow-xl bg-white p-6 flex flex-col items-center justify-center gap-2 group hover:border-secondary transition-all">
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8d6e63]">Suhoor</div>
-                                <div className="text-2xl font-black text-[#4a342e]">{dayMeals.suhoor || '--:--'}</div>
+                            <div className="rounded-3xl border-2 border-secondary/20 shadow-xl bg-card p-6 flex flex-col items-center justify-center gap-2 group hover:border-secondary transition-all">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Khatam Sehri</div>
+                                <div className="text-2xl font-black text-foreground">{dayMeals.suhoor || '--:--'}</div>
                                 <textarea
                                     className="w-full mt-2 bg-transparent border-t border-secondary/10 focus:outline-none resize-none font-bold text-xs text-muted-foreground placeholder:italic text-center pt-2"
                                     placeholder="Meal plan..."
@@ -186,9 +175,9 @@ export const NotebookPlanner: React.FC = () => {
                                     onChange={(e) => updateMeal(currentDay, 'suhoor', e.target.value)}
                                 />
                             </div>
-                            <div className="rounded-3xl border-2 border-secondary/20 shadow-xl bg-white p-6 flex flex-col items-center justify-center gap-2 group hover:border-secondary transition-all">
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8d6e63]">Iftar</div>
-                                <div className="text-2xl font-black text-[#4a342e]">{dayMeals.iftar || '--:--'}</div>
+                            <div className="rounded-3xl border-2 border-secondary/20 shadow-xl bg-card p-6 flex flex-col items-center justify-center gap-2 group hover:border-secondary transition-all">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Iftar</div>
+                                <div className="text-2xl font-black text-foreground">{dayMeals.iftar || '--:--'}</div>
                                 <textarea
                                     className="w-full mt-2 bg-transparent border-t border-secondary/10 focus:outline-none resize-none font-bold text-xs text-muted-foreground placeholder:italic text-center pt-2"
                                     placeholder="Meal plan..."

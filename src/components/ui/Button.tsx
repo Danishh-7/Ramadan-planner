@@ -16,7 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
     const baseStyles = 'inline-flex items-center justify-center font-bold rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 hover:scale-[1.01] flex-shrink-0';
 
     const variantStyles = {
-        primary: 'bg-[#8D6E63] hover:bg-[#795548] text-white shadow-xl shadow-brown-900/10',
+        primary: 'bg-[#4a342e] hover:bg-[#FDFCF0] hover:text-[#4a342e] text-white shadow-xl shadow-brown-900/10 border border-[#4a342e]',
         secondary: 'bg-gradient-to-br from-secondary to-orange-600 text-secondary-foreground shadow-lg hover:shadow-secondary/20',
         ghost: 'bg-transparent hover:bg-muted text-foreground border border-border/10',
         danger: 'bg-gradient-to-br from-missed to-rose-700 text-white shadow-lg hover:shadow-missed/20',

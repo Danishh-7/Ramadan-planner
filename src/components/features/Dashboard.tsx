@@ -83,23 +83,23 @@ export const Dashboard: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
-                <div className="relative p-6 notebook-border rounded-[3rem] bg-white shadow-2xl">
+                <div className="relative p-6 notebook-border rounded-[3rem] bg-card shadow-2xl">
                     <div className="absolute inset-0 islamic-pattern opacity-5 pointer-events-none" />
                     <ProgressHeart />
                 </div>
 
                 <div className="space-y-8">
-                    <Card className="p-8 rounded-[2.5rem] notebook-shadow space-y-8 bg-white shadow-xl">
+                    <Card className="p-8 rounded-[2.5rem] notebook-shadow space-y-8 bg-card shadow-xl">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-3xl font-black italic text-[#4a342e]">Spiritual Growth</h2>
+                                <h2 className="text-3xl font-black italic text-card-foreground">Spiritual Growth</h2>
                                 <div className="text-2xl font-black text-primary">{overallProgress}%</div>
                             </div>
-                            <ProgressBar value={overallProgress} color="primary" showPercentage={false} className="h-6 rounded-full border-4 border-[#fdfcf0] shadow-inner" />
+                            <ProgressBar value={overallProgress} color="primary" showPercentage={false} className="h-6 rounded-full border-4 border-background shadow-inner" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 pt-4">
-                            <div className="bg-[#4a342e] text-white p-6 rounded-3xl space-y-2 shadow-lg relative overflow-hidden">
+                            <div className="bg-primary text-primary-foreground p-6 rounded-3xl space-y-2 shadow-lg relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-3 opacity-10">
                                     <Zap className="w-12 h-12" />
                                 </div>
@@ -109,15 +109,15 @@ export const Dashboard: React.FC = () => {
                                 </div>
                                 <div className="text-4xl font-black">{currentStreak} Days</div>
                             </div>
-                            <div className="bg-[#fdfcf0] border-2 border-border p-6 rounded-3xl space-y-2 shadow-md relative overflow-hidden">
+                            <div className="bg-background border-2 border-border p-6 rounded-3xl space-y-2 shadow-md relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-3 opacity-5">
                                     <Calendar className="w-12 h-12" />
                                 </div>
                                 <div className="flex items-center gap-2 opacity-60">
-                                    <Calendar className="w-4 h-4 text-[#4a342e]" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-[#4a342e]">Current</span>
+                                    <Calendar className="w-4 h-4 text-foreground" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Current</span>
                                 </div>
-                                <div className="text-4xl font-black text-[#4a342e]">{currentDay}<span className="text-xl opacity-30">/30</span></div>
+                                <div className="text-4xl font-black text-foreground">{currentDay}<span className="text-xl opacity-30">/30</span></div>
                             </div>
                         </div>
                     </Card>
@@ -130,23 +130,23 @@ export const Dashboard: React.FC = () => {
                     { title: 'Fasts', icon: Heart, val: fastingStats.completed, total: 30, perc: fastingStats.percentage, color: 'text-secondary', bg: 'bg-secondary/10', border: 'border-secondary/20' },
                     { title: 'Quran', icon: BookOpen, val: quranStats.completedJuz, total: 30, perc: quranStats.percentage, color: 'text-completed', bg: 'bg-completed/10', border: 'border-completed/20', unit: 'Juz' }
                 ].map((stat, idx) => (
-                    <Card key={idx} hover className={`p-8 rounded-[2rem] space-y-6 relative group bg-white shadow-lg border-2 ${stat.border} transition-all hover:translate-y-[-4px]`}>
+                    <Card key={idx} hover className={`p-8 rounded-[2rem] space-y-6 relative group bg-card shadow-lg border-2 ${stat.border} transition-all hover:translate-y-[-4px]`}>
                         <div className={`absolute top-0 right-0 p-5 ${stat.bg} rounded-bl-[2.5rem] shadow-sm`}>
                             <stat.icon className={`w-8 h-8 ${stat.color}`} />
                         </div>
                         <div className="pt-2">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8d6e63] opacity-60 mb-2">{stat.title} Completion</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 mb-2">{stat.title} Completion</h3>
                             <div className="flex items-baseline gap-2">
                                 <span className={`text-6xl font-black ${stat.color} tracking-tighter`}>{stat.val}</span>
-                                <span className="text-[#8d6e63] font-black text-sm opacity-40">/ {stat.total} {stat.unit || ''}</span>
+                                <span className="text-muted-foreground font-black text-sm opacity-40">/ {stat.total} {stat.unit || ''}</span>
                             </div>
                         </div>
-                        <ProgressBar value={stat.perc} showPercentage={false} className="h-3 rounded-full bg-[#fdfcf0]" color={stat.title === 'Prayers' ? 'primary' : stat.title === 'Fasts' ? 'secondary' : 'completed'} />
+                        <ProgressBar value={stat.perc} showPercentage={false} className="h-3 rounded-full bg-background" color={stat.title === 'Prayers' ? 'primary' : stat.title === 'Fasts' ? 'secondary' : 'completed'} />
                     </Card>
                 ))}
             </div>
 
-            <div className="relative overflow-hidden rounded-[3rem] p-12 text-center bg-[#4a342e] text-white notebook-shadow">
+            <div className="relative overflow-hidden rounded-[3rem] p-12 text-center bg-primary text-primary-foreground notebook-shadow">
                 <div className="absolute bottom-0 right-0 p-4 opacity-5 rotate-12">
                     <Trophy className="w-64 h-64" />
                 </div>

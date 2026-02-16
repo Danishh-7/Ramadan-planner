@@ -57,7 +57,7 @@ export const RamadanTracker: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex items-center justify-center gap-8 bg-white/40 p-6 rounded-[2.5rem] notebook-border mx-auto max-w-sm">
+            <div className="flex items-center justify-center gap-8 bg-card/40 p-6 rounded-[2.5rem] notebook-border mx-auto max-w-sm">
                 <Button variant="ghost" size="sm" onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))} disabled={selectedDay === 1} className="rounded-full w-10 h-10 p-0"><ChevronLeft className="w-6 h-6" /></Button>
                 <div className="text-center">
                     <h2 className="text-3xl font-black italic">Day {selectedDay}</h2>
@@ -86,26 +86,9 @@ export const RamadanTracker: React.FC = () => {
                 </Card>
 
                 <div className="space-y-10">
-                    <Card glass className="p-8 rounded-[3rem] notebook-border space-y-6">
-                        <h3 className="text-2xl font-black italic border-b-2 border-dotted border-border pb-4">Blessings</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            {[
-                                { key: 'sehri' as const, label: 'Suhoor', icon: '🌙' },
-                                { key: 'iftar' as const, label: 'Iftar', icon: '🌅' }
-                            ].map((meal) => (
-                                <button
-                                    key={meal.key}
-                                    onClick={() => updatePrayerStatus(selectedDay, meal.key, !dayPrayers[meal.key])}
-                                    className={`p-8 rounded-[2rem] transition-all ${dayPrayers[meal.key] ? 'bg-completed text-white shadow-xl' : 'bg-muted/30 text-muted-foreground border-2 border-dashed border-border/50'}`}
-                                >
-                                    <div className="text-3xl mb-2">{meal.icon}</div>
-                                    <div className="font-black text-sm uppercase tracking-widest">{meal.label}</div>
-                                </button>
-                            ))}
-                        </div>
-                    </Card>
 
-                    <Card glass className="p-8 rounded-[3rem] bg-[#4a342e] text-white notebook-shadow text-center space-y-4">
+
+                    <Card glass className="p-8 rounded-[3rem] bg-primary text-primary-foreground notebook-shadow text-center space-y-4">
                         <Star className="w-10 h-10 mx-auto text-secondary fill-secondary animate-pulse" />
                         <p className="text-lg font-bold italic">"Whoever fasts Ramadan out of faith and in the hope of reward, his previous sins will be forgiven."</p>
                         <p className="text-xs font-black uppercase tracking-widest text-secondary/60">Hadith Bukhari</p>

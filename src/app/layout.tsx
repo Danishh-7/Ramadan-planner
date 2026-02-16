@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 import { NotificationProvider } from "@/components/providers/NotificationProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AlarmOverlay } from "@/components/ui/AlarmOverlay";
 
 export default function RootLayout({
@@ -25,8 +26,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={outfit.variable}>
       <body className={`${outfit.className} antialiased`}>
         <NotificationProvider>
-          {children}
-          <AlarmOverlay />
+          <ThemeProvider>
+            {children}
+            <AlarmOverlay />
+          </ThemeProvider>
         </NotificationProvider>
       </body>
     </html>

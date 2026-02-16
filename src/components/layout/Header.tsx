@@ -11,13 +11,7 @@ export const Header: React.FC = () => {
 
     useEffect(() => {
         setMounted(true);
-        // Apply theme to document
-        if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            document.documentElement.removeAttribute('data-theme');
-        }
-    }, [theme]);
+    }, []);
 
     const toggleTheme = () => {
         setTheme(theme === 'light' ? 'dark' : 'light');
