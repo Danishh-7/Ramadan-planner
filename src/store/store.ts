@@ -64,6 +64,11 @@ export interface MealPlan {
     iftar: string;
 }
 
+export interface QuranBookmark {
+    para: number;
+    aya: number;
+}
+
 export interface Alarm {
     id: string;
     day: number;
@@ -96,6 +101,10 @@ interface RamadanStore {
     notes: Note[];
     alarms: Alarm[];
 
+    // Quran Tracking
+    quranBookmark: QuranBookmark;
+    quranCompletionCount: number;
+
     // Configuration
     khatamPlan: {
         totalPages: number;
@@ -109,6 +118,12 @@ interface RamadanStore {
     setNotificationsEnabled: (enabled: boolean) => void;
     setLocation: (city: string, country: string) => void;
     fetchTimings: (day: number) => Promise<void>;
+
+    // Quran Actions
+    setQuranBookmark: (para: number, aya: number) => void;
+    completeQuranJourneys: () => void;
+    resetJuzForNewJourney: () => void;
+    setQuranCompletionCount: (count: number) => void;
 
     // Activity Actions
     updatePrayerStatus: (day: number, prayer: keyof DailyPrayers, status: PrayerStatus | boolean) => void;
@@ -195,6 +210,8 @@ export const useRamadanStore = create<RamadanStore>()(
             selectedSound: 'beep',
             customSounds: [],
             khatamPlan: { totalPages: 604, pagesPerDay: 20 },
+            quranBookmark: { para: 1, aya: 1 },
+            quranCompletionCount: 0,
 
             setRamadanStartDate: (date) => set({ ramadanStartDate: date }),
             setCurrentDay: (day) => set({ currentDay: day }),
@@ -272,6 +289,16 @@ export const useRamadanStore = create<RamadanStore>()(
             }),
 
             setKhatamPlan: (totalPages, pagesPerDay) => set({ khatamPlan: { totalPages, pagesPerDay } }),
+
+            setQuranBookmark: (para, aya) => set({ quranBookmark: { para, aya } }),
+
+            completeQuranJourneys: () => set((state) => ({
+                quranCompletionCount: state.quranCompletionCount + 1
+            })),
+
+            resetJuzForNewJourney: () => set({ juzCompleted: Array(30).fill(false) }),
+
+            setQuranCompletionCount: (count) => set({ quranCompletionCount: Math.max(0, count) }),
 
             addHabit: (day, habit) => set((state) => ({ habits: { ...state.habits, [day]: [...(state.habits[day] || []), { ...habit, id: Date.now().toString() }] } })),
             toggleHabit: (day, habitId) => set((state) => ({ habits: { ...state.habits, [day]: (state.habits[day] || []).map(h => h.id === habitId ? { ...h, completed: !h.completed } : h) } })),
