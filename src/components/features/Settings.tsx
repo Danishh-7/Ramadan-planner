@@ -90,16 +90,7 @@ export const Settings: React.FC = () => {
                         Set your city and country to get accurate prayer timings.
                     </p>
                     <div className="space-y-4">
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-[#8d6e63] ml-1">City</label>
-                            <input
-                                type="text"
-                                value={userCity}
-                                onChange={(e) => setLocation(e.target.value, userCountry)}
-                                placeholder="Enter City"
-                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-[#fdfcf0] focus:border-primary focus:outline-none font-black text-[#4a342e] shadow-inner"
-                            />
-                        </div>
+
                         <div className="space-y-1">
                             <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">City</label>
                             <input

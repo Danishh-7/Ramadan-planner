@@ -32,23 +32,31 @@ export const DuasSection: React.FC = () => {
                 <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">"Call upon Me; I will respond to you."</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-[#fdfcf0] p-4 rounded-[2.5rem] notebook-border shadow-inner">
-                <div className="flex gap-2">
+            <div className="sticky top-4 z-40 flex flex-col sm:flex-row gap-6 bg-[#fdfcf0] p-6 rounded-[2.5rem] shadow-inner">
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:items-center sm:justify-start">
                     {categories.map((cat) => (
                         <button
                             key={cat.id}
                             onClick={() => setFilter(cat.id)}
-                            className={`px-5 py-2.5 rounded-2xl flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-all ${filter === cat.id ? 'bg-[#4a342e] text-white shadow-xl' : 'hover:bg-muted/50 text-muted-foreground'}`}
+                            className={`w-full sm:w-auto px-5 py-3 rounded-2xl flex items-center justify-center sm:justify-start gap-2 text-xs font-black uppercase tracking-widest transition-all ${filter === cat.id ? 'bg-[#4a342e] text-white shadow-xl' : 'text-gray-600 hover:bg-gray-200'}`}
                         >
                             <cat.icon className="w-4 h-4" />
                             {cat.label}
                         </button>
                     ))}
                 </div>
-                <Button onClick={() => setShowAddModal(true)} className="rounded-2xl px-6 py-6 font-black bg-secondary text-[#4a342e] hover:bg-[#4a342e] hover:text-white shadow-lg transition-all">
-                    <Plus className="w-5 h-5 mr-1" /> NEW DUA
-                </Button>
+                <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+                    <Button
+                        onClick={() => setShowAddModal(true)}
+                        className="w-full sm:w-auto max-w-xs rounded-2xl px-6 py-4 font-black bg-[#f4b04f] text-[#4a342e] hover:bg-[#4a342e] hover:text-white shadow-lg transition-all"
+                    >
+                        <Plus className="w-5 h-5 mr-1" /> NEW DUA
+                    </Button>
+                </div>
+
             </div>
+
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {filteredDuas.map((dua) => (
@@ -100,6 +108,6 @@ export const DuasSection: React.FC = () => {
                     </div>
                 </div>
             </Modal>
-        </div>
+        </div >
     );
 };

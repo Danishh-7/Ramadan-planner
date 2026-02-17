@@ -71,14 +71,36 @@ export const RamadanTracker: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                         {prayerList.map((prayer) => {
                             const status = dayPrayers[prayer.key as keyof DailyPrayers];
+
+                            // Calculate Real-Time Day for Locking Logic
+                            const todayDate = new Date();
+                            todayDate.setHours(0, 0, 0, 0);
+                            const startDate = new Date(ramadanStartDate);
+                            startDate.setHours(0, 0, 0, 0);
+                            const diffTime = Math.abs(todayDate.getTime() - startDate.getTime());
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                            const realTimeDay = diffDays > 30 ? 30 : diffDays < 1 ? 1 : diffDays;
+
+                            const isPast = selectedDay < realTimeDay;
+                            const isFuture = selectedDay > realTimeDay;
+                            const isLocked = isPast || isFuture;
+
                             return (
                                 <button
                                     key={prayer.key}
+                                    disabled={isLocked}
                                     onClick={() => updatePrayerStatus(selectedDay, prayer.key as keyof DailyPrayers, getNextStatus(status as PrayerStatus))}
-                                    className={`p-6 rounded-[2rem] transition-all transform hover:scale-105 border-2 ${status ? 'border-transparent' : 'border-border/30'} ${getStatusColor(status as PrayerStatus)} ${status ? 'text-white shadow-lg' : 'text-muted-foreground'}`}
+                                    className={`p-6 rounded-[2rem] transition-all transform border-2 
+                                        ${status ? 'border-transparent' : 'border-border/30'} 
+                                        ${getStatusColor(status as PrayerStatus)} 
+                                        ${status ? 'text-white shadow-lg' : 'text-muted-foreground'} 
+                                        ${isFuture ? 'opacity-50 cursor-not-allowed grayscale' : ''}
+                                        ${isPast ? 'cursor-not-allowed' : 'hover:scale-105'}
+                                    `}
                                 >
                                     <prayer.icon className={`w-6 h-6 mx-auto mb-2 ${status ? 'opacity-100' : 'opacity-20'}`} />
                                     <div className="font-black text-sm uppercase tracking-widest">{prayer.label}</div>
+                                    {isFuture && <div className="text-[8px] uppercase tracking-widest mt-1 opacity-70">Locked</div>}
                                 </button>
                             );
                         })}

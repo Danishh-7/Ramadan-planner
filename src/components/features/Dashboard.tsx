@@ -6,6 +6,7 @@ import { Card } from '../ui/Card';
 import { ProgressBar } from '../ui/ProgressBar';
 import { CheckCircle2, BookOpen, Heart, Calendar, Trophy, Zap } from 'lucide-react';
 import { ProgressHeart } from '../ui/ProgressHeart';
+import { Clock } from '../ui/Clock';
 
 export const Dashboard: React.FC = () => {
     const { currentDay, prayers = {}, fasting = {}, juzCompleted = [], dailyPages = {}, habits = {}, tasks = {} } = useRamadanStore();
@@ -82,45 +83,50 @@ export const Dashboard: React.FC = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
-                <div className="relative p-6 notebook-border rounded-[3rem] bg-card shadow-2xl">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                {/* 1. Progress Heart */}
+                <div className="relative p-6 notebook-border rounded-[3rem] bg-card shadow-2xl flex flex-col justify-center min-h-[380px]">
                     <div className="absolute inset-0 islamic-pattern opacity-5 pointer-events-none" />
                     <ProgressHeart />
                 </div>
 
-                <div className="space-y-8">
-                    <Card className="p-8 rounded-[2.5rem] notebook-shadow space-y-8 bg-card shadow-xl">
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-3xl font-black italic text-card-foreground">Spiritual Growth</h2>
-                                <div className="text-2xl font-black text-primary">{overallProgress}%</div>
-                            </div>
-                            <ProgressBar value={overallProgress} color="primary" showPercentage={false} className="h-6 rounded-full border-4 border-background shadow-inner" />
+                {/* 2. Spiritual Growth Stats */}
+                <Card className="p-8 rounded-[2.5rem] notebook-shadow bg-card shadow-xl flex flex-col justify-between min-h-[380px]">
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-3xl font-black italic text-card-foreground">Spiritual Growth</h2>
+                            <div className="text-2xl font-black text-primary">{overallProgress}%</div>
                         </div>
+                        <ProgressBar value={overallProgress} color="primary" showPercentage={false} className="h-6 rounded-full border-4 border-background shadow-inner" />
+                    </div>
 
-                        <div className="grid grid-cols-2 gap-4 pt-4">
-                            <div className="bg-primary text-primary-foreground p-6 rounded-3xl space-y-2 shadow-lg relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-3 opacity-10">
-                                    <Zap className="w-12 h-12" />
-                                </div>
-                                <div className="flex items-center gap-2 opacity-60">
-                                    <Zap className="w-4 h-4 text-secondary" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-secondary">Streak</span>
-                                </div>
-                                <div className="text-4xl font-black">{currentStreak} Days</div>
+                    <div className="grid grid-cols-2 gap-4 flex-1 items-end mt-4">
+                        <div className="bg-primary text-primary-foreground p-5 rounded-3xl space-y-1 shadow-lg relative overflow-hidden h-32 flex flex-col justify-center">
+                            <div className="absolute top-0 right-0 p-3 opacity-10">
+                                <Zap className="w-12 h-12" />
                             </div>
-                            <div className="bg-background border-2 border-border p-6 rounded-3xl space-y-2 shadow-md relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-3 opacity-5">
-                                    <Calendar className="w-12 h-12" />
-                                </div>
-                                <div className="flex items-center gap-2 opacity-60">
-                                    <Calendar className="w-4 h-4 text-foreground" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Current</span>
-                                </div>
-                                <div className="text-4xl font-black text-foreground">{currentDay}<span className="text-xl opacity-30">/30</span></div>
+                            <div className="flex items-center gap-2 opacity-60">
+                                <Zap className="w-4 h-4 text-secondary" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-secondary">Streak</span>
                             </div>
+                            <div className="text-3xl font-black">{currentStreak} Days</div>
                         </div>
-                    </Card>
+                        <div className="bg-background border-2 border-border p-5 rounded-3xl space-y-1 shadow-md relative overflow-hidden h-32 flex flex-col justify-center">
+                            <div className="absolute top-0 right-0 p-3 opacity-5">
+                                <Calendar className="w-12 h-12" />
+                            </div>
+                            <div className="flex items-center gap-2 opacity-60">
+                                <Calendar className="w-4 h-4 text-foreground" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Current</span>
+                            </div>
+                            <div className="text-3xl font-black text-foreground">{currentDay}<span className="text-xl opacity-30">/30</span></div>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* 3. Clock */}
+                <div className="h-full min-h-[380px]">
+                    <Clock />
                 </div>
             </div>
 

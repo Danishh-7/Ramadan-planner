@@ -38,31 +38,52 @@ export const FastingTracker: React.FC = () => {
                                 {currentStatus ? <currentStatus.icon className="w-6 h-6" /> : <Heart className="w-6 h-6 opacity-40" />}
                             </div>
 
-                            {!isFuture && (
-                                <div className="flex flex-col gap-1 pt-2">
-                                    {statuses.map(s => (
-                                        <button
-                                            key={s.value}
-                                            onClick={() => updateFastingStatus(day, s.value)}
-                                            className={`text-[10px] font-black uppercase tracking-widest py-1.5 rounded-lg transition-all ${status === s.value ? `${s.bg} text-white shadow-sm` : 'hover:bg-muted text-muted-foreground'}`}
-                                        >
-                                            {s.label}
-                                        </button>
-                                    ))}
-                                    {status && (
-                                        <button
-                                            onClick={() => updateFastingStatus(day, null)}
-                                            className="text-[10px] font-black text-missed/60 hover:text-missed mt-1 p-1 uppercase tracking-tighter"
-                                        >
-                                            CLEAR
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+                            {/* STRICT LOCKING: Only show controls if day === realTimeDay */}
+                            {(() => {
+                                const todayDate = new Date();
+                                todayDate.setHours(0, 0, 0, 0);
+                                const startDate = new Date(useRamadanStore.getState().ramadanStartDate);
+                                startDate.setHours(0, 0, 0, 0);
+                                const diffTime = Math.abs(todayDate.getTime() - startDate.getTime());
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                const realTimeDay = diffDays > 30 ? 30 : diffDays < 1 ? 1 : diffDays;
+
+                                const isFuture = day > realTimeDay;
+                                const isPast = day < realTimeDay;
+                                const isLocked = isFuture || isPast;
+
+                                if (isFuture) return <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest pt-4 pb-2">Locked</div>;
+
+                                return (
+                                    <div className="flex flex-col gap-1 pt-2">
+                                        {statuses.map(s => (
+                                            <button
+                                                key={s.value}
+                                                disabled={isLocked}
+                                                onClick={() => updateFastingStatus(day, s.value)}
+                                                className={`text-[10px] font-black uppercase tracking-widest py-1.5 rounded-lg transition-all 
+                                                    ${status === s.value ? `${s.bg} text-white shadow-sm` : 'bg-muted/10 text-muted-foreground'} 
+                                                    ${!isLocked ? 'hover:bg-muted' : 'cursor-not-allowed opacity-80'}
+                                                `}
+                                            >
+                                                {s.label}
+                                            </button>
+                                        ))}
+                                        {status && !isLocked && (
+                                            <button
+                                                onClick={() => updateFastingStatus(day, null)}
+                                                className="text-[10px] font-black text-missed/60 hover:text-missed mt-1 p-1 uppercase tracking-tighter"
+                                            >
+                                                CLEAR
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </Card>
                     );
                 })}
             </div>
-        </div>
+        </div >
     );
 };
