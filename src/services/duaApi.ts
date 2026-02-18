@@ -78,3 +78,19 @@ export const fetchAuthenticDuas = async () => {
                 dua.category_slug === 'selected-dua'
         }));
 };
+
+export const fetchRamadanDhikr = async (): Promise<ApiDua[]> => {
+    try {
+        const response = await fetch(`${BASE_URL}/categories/ramadan`, {
+            headers: {
+                'Accept-Language': 'en'
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch Ramadan dhikr');
+        const json: ApiResponse = await response.json();
+        return json.data;
+    } catch (error) {
+        console.error('Error fetching Ramadan dhikr:', error);
+        return [];
+    }
+};

@@ -122,3 +122,49 @@
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
 }
+
+/* Scrapbook Specific Styles */
+.scrapbook-bg {
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  background-color: #fdfcf0;
+}
+
+.washi-tape {
+  position: absolute;
+  width: 100px;
+  height: 30px;
+  background: rgba(255, 204, 128, 0.6);
+  transform: rotate(-5deg);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+  z-index: 10;
+}
+
+.washi-tape-pink {
+  background: rgba(244, 143, 177, 0.6);
+  transform: rotate(3deg);
+}
+
+.washi-tape-green {
+  background: rgba(129, 199, 132, 0.6);
+  transform: rotate(-2deg);
+}
+
+.notebook-lines {
+  background-image: linear-gradient(#e1f5fe 1.1px, transparent 1.1px);
+  background-size: 100% 1.5rem;
+  line-height: 1.5rem;
+}
+
+.paper-edge {
+  filter: url('#paper-edge');
+}
+
+.scrapbook-card {
+  @apply rounded-xl shadow-md border border-black/5 relative;
+  transition: transform 0.2s ease-in-out;
+}
+
+.scrapbook-card:hover {
+  transform: translateY(-2px) rotate(0.5deg);
+}

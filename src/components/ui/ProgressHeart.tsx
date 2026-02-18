@@ -109,6 +109,7 @@ export const ProgressHeart: React.FC = () => {
     }
 
     return (
+       <>
         <div className="relative w-full aspect-square max-w-[400px] mx-auto flex flex-col items-center justify-center p-6 overflow-hidden group">
             {/* Creative Title */}
             <div className="absolute top-4 left-0 w-full flex flex-col items-center justify-center z-10 pointer-events-none">
@@ -219,16 +220,21 @@ export const ProgressHeart: React.FC = () => {
 
             </div>
             {/* Legend - Moved to a side or bottom area that doesn't overlap */}
-            <div className="absolute bottom-4 mt-20 left-0 w-full flex justify-center gap-8 py-2 bg-white/40 border-t border-[#3e2723]/5 ">
-                <div className="flex mt-2 items-center gap-2">
+           
+        </div>
+        <div>
+            <div className='flex col justify-center items-center gap-3'>
+                 <div className="flex mt-2 items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-white opacity-60 shadow-md" />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-[#3e2723]/60">Locked</span>
+                    <span className="text-[8px] font-black uppercase tracking-widest ">Locked</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-secondary shadow-lg animate-pulse" />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-[#3e2723]">Active</span>
+                <div className="flex items-center gap-2 mt-2">
+                    <div className="w-3 h-3 rounded-full bg-red-400 shadow-lg animate-pulse" />
+                    <span className="text-[8px] font-black uppercase tracking-widest ">Active</span>
                 </div>
             </div>
         </div>
+       </>
+       
     );
 };

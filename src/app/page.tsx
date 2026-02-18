@@ -15,6 +15,7 @@ import { DuasSection } from '@/components/features/DuasSection';
 import { NotesSection } from '@/components/features/NotesSection';
 import { Settings } from '@/components/features/Settings';
 import { NotebookPlanner } from '@/components/features/NotebookPlanner';
+import { ScrapbookPlanner } from '@/components/features/ScrapbookPlanner';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -28,6 +29,8 @@ export default function Home() {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
+      case 'scrapbook-planner':
+        return <ScrapbookPlanner />;
       case 'notebook-planner':
         return <NotebookPlanner />;
       case 'ramadan-tracker':

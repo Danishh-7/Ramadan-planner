@@ -24,7 +24,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     };
 
     return (
-        <div className={`w-full ${className}`}>
+        <div>
             <div className="flex items-center justify-between mb-2">
                 {showPercentage && (
                     <span className="text-sm font-semibold text-muted-foreground">
