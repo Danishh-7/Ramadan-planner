@@ -192,13 +192,13 @@ const defaultChallenges: Challenge[] = Array.from({ length: 30 }, (_, i) => ({
 export const useRamadanStore = create<RamadanStore>()(
     persist(
         (set, get) => ({
-            ramadanStartDate: new Date().toISOString().split('T')[0],
+            ramadanStartDate: '2026-02-19',
             currentDay: 1,
             theme: 'light',
             notificationsEnabled: true,
             userCity: 'Dadri',
             userCountry: 'India',
-            latitude: null,
+            latitude: null, // kept for potential prayer time usage if needed, but not auto-detected
             longitude: null,
             prayers: {},
             fasting: {},
@@ -218,15 +218,24 @@ export const useRamadanStore = create<RamadanStore>()(
             quranBookmark: { para: 1, aya: 1 },
             quranCompletionCount: 0,
 
-            setRamadanStartDate: (date) => set({ ramadanStartDate: date }),
+            setRamadanStartDate: (date) => set({ ramadanStartDate: date }), // kept for manual override if ever needed
             setCurrentDay: (day) => set({ currentDay: day }),
             setTheme: (theme) => set({ theme }),
             setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
             setLocation: (city, country) => set({ userCity: city, userCountry: country }),
 
             syncRamadanDay: () => {
-                const { ramadanStartDate } = get();
-                const start = new Date(ramadanStartDate);
+                const state = get();
+
+                // FORCE: Removed strict Feb 19 check to allow manual overrides.
+                // We only force Country to India for default context, but date is now flexible.
+                if (state.userCountry !== 'India') {
+                    set({ userCountry: 'India', userCity: 'Dadri' });
+                }
+
+                // Parse date string manually to avoid timezone issues.
+                const [year, month, day] = state.ramadanStartDate.split('-').map(Number);
+                const start = new Date(year, month - 1, day); // month is 0-indexed
                 const now = new Date();
 
                 // Reset hours to compare just the dates
@@ -248,59 +257,13 @@ export const useRamadanStore = create<RamadanStore>()(
             },
 
             detectLocation: async () => {
-                const { getRamadanStartDate, getSehriIftarTimings } = await import('@/services/aladhanApi');
+                // Feature removed per user request for India-only app
+                console.log('Location detection disabled. Defaulting to India settings.');
+                get().syncRamadanDay();
 
-                if (!navigator.geolocation) {
-                    console.log('Geolocation is not supported by your browser');
-                    return;
-                }
-
-                try {
-                    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                        navigator.geolocation.getCurrentPosition(resolve, reject);
-                    });
-
-                    const { latitude, longitude } = position.coords;
-
-                    // Update state with location
-                    set({ latitude, longitude });
-
-                    // Fetch Ramadan Start Date for this location
-                    const userCountry = get().userCountry;
-                    const startDate = await getRamadanStartDate(undefined, userCountry, latitude, longitude);
-                    set({ ramadanStartDate: startDate });
-
-                    // Re-sync current day based on new start date
-                    get().syncRamadanDay();
-
-                    // Refresh timings for current day if active
-                    const currentDay = get().currentDay;
-                    // We can also fetch the user's city/country name using reverse geocoding here if desired, 
-                    // but for now we'll stick to coordinates for calculations.
-
-                    // Fetch timings for validation
-                    get().fetchTimings(currentDay);
-
-                } catch (error: any) {
-                    if (error.code) {
-                        switch (error.code) {
-                            case 1:
-                                console.log('User denied location permission. Using default location.');
-                                break;
-                            case 2:
-                                console.log('Location unavailable. Using default location.');
-                                break;
-                            case 3:
-                                console.log('Location request timed out. Using default location.');
-                                break;
-                            default:
-                                console.error('An unknown error occurred detecting location.');
-                        }
-                    } else {
-                        console.error('Error detecting location:', error);
-                    }
-                    // Fallback is implicitly handled as we default to 'Dadri', 'India' in initial state
-                }
+                // Fetch timings for validation with default location (Dadri, India)
+                const currentDay = get().currentDay;
+                get().fetchTimings(currentDay);
             },
 
             fetchTimings: async (day) => {
@@ -310,8 +273,7 @@ export const useRamadanStore = create<RamadanStore>()(
                 // Prioritize coordinates if available
                 const timings = await getSehriIftarTimings(userCity, userCountry, latitude || undefined, longitude || undefined);
 
-                // Timings fetched successfully - notifications or other logic can go here
-                // We no longer overwrite 'meals' with timings as that is for user text input
+                // Timings fetched successfully
             },
 
             updatePrayerStatus: (day, prayer, status) => {
@@ -432,6 +394,6 @@ export const useRamadanStore = create<RamadanStore>()(
                 }
             },
         }),
-        { name: 'ramadan-planner-storage' }
+        { name: 'ramadan-planner-storage-v2' }
     )
 );

@@ -23,11 +23,46 @@ export const Settings: React.FC = () => {
     const [showAddAlarm, setShowAddAlarm] = useState(false);
     const [newAlarm, setNewAlarm] = useState({ type: 'General', time: '05:00', day: 1 });
 
+    // ... (previous code)
+
     // UI Loading & Toast States
     const [isLoadingTimings, setIsLoadingTimings] = useState(false);
     const [toastState, setToastState] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'loading' }>({
         visible: false, message: '', type: 'success'
     });
+
+    // Manual Date Selection State
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [pendingDate, setPendingDate] = useState<string | null>(null);
+    const [confirmationStep, setConfirmationStep] = useState<1 | 2>(1);
+
+    const handleDateChangeAttempt = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPendingDate(e.target.value);
+        setConfirmationStep(1);
+        setShowResetModal(true);
+    };
+
+    const confirmDateChange = () => {
+        if (confirmationStep === 1) {
+            setConfirmationStep(2);
+        } else {
+            if (pendingDate) {
+                setRamadanStartDate(pendingDate);
+                // Force a sync immediately after setting
+                useRamadanStore.getState().syncRamadanDay();
+                setToastState({ visible: true, message: 'Ramadan Start Date updated successfully.', type: 'success' });
+            }
+            setShowResetModal(false);
+            setPendingDate(null);
+            setConfirmationStep(1);
+        }
+    };
+
+    const cancelDateChange = () => {
+        setShowResetModal(false);
+        setPendingDate(null);
+        setConfirmationStep(1);
+    };
 
     // Local state for immediate UI updates (prevents API call on every keystroke)
     const [localCity, setLocalCity] = useState(userCity);
@@ -99,6 +134,7 @@ export const Settings: React.FC = () => {
 
             {/* Ramadan Configuration */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                 <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-3 bg-primary/10 rounded-2xl text-primary">
@@ -112,58 +148,44 @@ export const Settings: React.FC = () => {
                     <input
                         type="date"
                         value={ramadanStartDate}
-                        onChange={(e) => setRamadanStartDate(e.target.value)}
-                        className="w-full px-5 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] bg-background/50 focus:border-primary focus:outline-none font-black text-foreground shadow-inner cursor-not-allowed opacity-80"
-                        readOnly
+                        onChange={handleDateChangeAttempt}
+                        className="w-full px-5 py-4 rounded-2xl border-2 border-black dark:border-white [color-scheme:light] dark:[color-scheme:dark] bg-background  focus:outline-none font-black  shadow-inner cursor-pointer"
                     />
                     <p className="text-xs text-secondary font-bold italic px-1">
-                        * Auto-detected based on {userCountry} ({ramadanStartDate})
+                        * Defaulted to {userCountry}. Click to change manually.
                     </p>
                 </Card>
 
-                <Card className="flex flex-col gap-4 bg-white shadow-xl">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-3 bg-primary/10 rounded-2xl text-primary">
-                            <Clock className="w-6 h-6" />
-                        </div>
-                        <h3 className="text-xl font-black text-[#4a342e]">Location Settings</h3>
-                    </div>
-                    <p className="text-sm text-[#8d6e63] font-bold px-1 opacity-70">
-                        Set your city and country to get accurate prayer timings.
-                    </p>
+                {/* ... (Reminders Card) */}
+
+                {/* Date Change Confirmation Modal */}
+                <Modal isOpen={showResetModal} onClose={cancelDateChange} title="Change Start Date?" size="sm">
                     <div className="space-y-4">
-
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Country</label>
-                            <SearchableSelect
-                                value={localCountry}
-                                options={COUNTRIES}
-                                onChange={handleCountryChange}
-                                placeholder="Select Country"
-                            />
+                        <div className="p-4 bg-red-50 text-red-900 rounded-xl border-2 border-red-100">
+                            {confirmationStep === 1 ? (
+                                <p className="font-bold text-sm">
+                                    Are you sure you want to change the Ramadan Start Date to <span className="underline">{pendingDate}</span>?
+                                    <br /><br />
+                                    This will shift all days and schedules in the app.
+                                </p>
+                            ) : (
+                                <p className="font-bold text-sm">
+                                    <span className="uppercase tracking-wider text-red-600">Final Confirmation</span>
+                                    <br /><br />
+                                    Setting an incorrect start date will misalign your prayers and tracker. Are you absolute certain?
+                                </p>
+                            )}
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">City</label>
-                            <SearchableSelect
-                                value={localCity}
-                                options={availableCities}
-                                onChange={setLocalCity}
-                                placeholder="Select City"
-                            />
+                        <div className="flex gap-3 pt-2">
+                            <Button variant="ghost" onClick={cancelDateChange} className="flex-1 rounded-2xl py-4 font-bold">Cancel</Button>
+                            <Button onClick={confirmDateChange} className="flex-1 rounded-2xl py-4 font-bold bg-red-600 text-white hover:bg-red-700">
+                                {confirmationStep === 1 ? 'Yes, Continue' : 'Confirm Change'}
+                            </Button>
                         </div>
                     </div>
+                </Modal>
 
-                    <div className="pt-4">
-                        <Button
-                            onClick={handleFetchTimings}
-                            disabled={isLoadingTimings}
-                            className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-secondary-foreground hover:bg-card shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                            {isLoadingTimings ? <Clock className="w-4 h-4 mr-2 animate-spin" /> : <Clock className="w-4 h-4 mr-2" />}
-                            {isLoadingTimings ? 'FETCHING...' : 'GET TIMINGS'}
-                        </Button>
-                    </div>
-                </Card>
+
 
                 <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">

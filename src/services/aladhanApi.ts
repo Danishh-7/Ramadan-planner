@@ -176,10 +176,6 @@ export async function getRamadanStartDate(city?: string, country?: string, latit
 
             console.log('Detected Timezone:', timezone);
 
-            if (timezone === 'Asia/Kolkata' || timezone === 'Asia/Calcutta' || (country && country.toLowerCase() === 'india')) {
-                offsetDays = 1; // India is usually +1 day due to moon sighting
-            }
-
             // Find first day where Hijri month is Ramadan (month number 9)
             // Debug: Check the first few entries
             console.log('Checking calendar for Ramadan start...');
@@ -197,7 +193,7 @@ export async function getRamadanStartDate(city?: string, country?: string, latit
                     console.log(`Found Ramadan Start: ${greg.day}-${month}-${greg.year} (Hijri Month: ${hijriMonth})`);
 
                     if (offsetDays > 0) {
-                        const date = new Date(`${greg.year}-${String(month).padStart(2, '0')}-${String(greg.day).padStart(2, '0')}`);
+                        const date = new Date(Number(greg.year), Number(month) - 1, Number(greg.day));
                         date.setDate(date.getDate() + offsetDays);
                         const offsetDate = date.toISOString().split('T')[0];
                         console.log(`Applying offset of ${offsetDays} days. New Date: ${offsetDate}`);
