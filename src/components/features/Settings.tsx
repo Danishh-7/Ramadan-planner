@@ -1,51 +1,68 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRamadanStore } from '@/store/store';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
-import { Download, Trash2, Calendar as CalendarIcon, Bell, Upload, Plus, Clock, Volume2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Bell, Plus, Clock, Volume2, Trash2 } from 'lucide-react';
 import { useNotifications } from '../providers/NotificationProvider';
+import { SearchableSelect } from '../ui/SearchableSelect';
+import { COUNTRIES, getCitiesForCountry } from '@/data/locations';
 
 export const Settings: React.FC = () => {
     const {
-        ramadanStartDate, setRamadanStartDate, resetAllData, exportData,
-        importData, alarms, addAlarm, toggleAlarm, deleteAlarm,
+        ramadanStartDate, setRamadanStartDate, alarms, addAlarm, toggleAlarm, deleteAlarm,
         notificationsEnabled, setNotificationsEnabled,
         selectedSound, setSelectedSound, customSounds, addCustomSound,
         userCity, userCountry, setLocation, fetchTimings, meals, currentDay
     } = useRamadanStore();
 
     const { requestPermission } = useNotifications();
-    const [showResetModal, setShowResetModal] = useState(false);
     const [showAddAlarm, setShowAddAlarm] = useState(false);
     const [newAlarm, setNewAlarm] = useState({ type: 'General', time: '05:00', day: 1 });
 
-    const handleExport = () => {
-        const data = exportData();
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `ramadan-planner-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
+    // Local state for immediate UI updates (prevents API call on every keystroke)
+    const [localCity, setLocalCity] = useState(userCity);
+    const [localCountry, setLocalCountry] = useState(userCountry);
+    const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-    const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const content = event.target?.result as string;
-                importData(content);
-            };
-            reader.readAsText(file);
+    // Sync local state when store updates
+    useEffect(() => {
+        setLocalCity(userCity);
+        setLocalCountry(userCountry);
+    }, [userCity, userCountry]);
+
+    // Get available cities for selected country
+    const availableCities = getCitiesForCountry(localCountry);
+
+    // Handle country change - reset city if not in new country's list
+    const handleCountryChange = (country: string) => {
+        setLocalCountry(country);
+        const citiesInCountry = getCitiesForCountry(country);
+        if (citiesInCountry.length > 0 && !citiesInCountry.includes(localCity)) {
+            setLocalCity(citiesInCountry[0]); // Set to first city in list
         }
     };
+
+    // Debounced API call - only triggers 1 second after user stops typing
+    useEffect(() => {
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+
+        debounceTimer.current = setTimeout(() => {
+            if (localCity && localCountry && (localCity !== userCity || localCountry !== userCountry)) {
+                setLocation(localCity, localCountry);
+            }
+        }, 1000); // Wait 1 second after user stops typing
+
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+        };
+    }, [localCity, localCountry]);
 
     const handleAddAlarm = () => {
         addAlarm({ ...newAlarm, enabled: true });
@@ -75,8 +92,12 @@ export const Settings: React.FC = () => {
                         type="date"
                         value={ramadanStartDate}
                         onChange={(e) => setRamadanStartDate(e.target.value)}
-                        className="w-full px-5 py-4 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner"
+                        className="w-full px-5 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] bg-background/50 focus:border-primary focus:outline-none font-black text-foreground shadow-inner cursor-not-allowed opacity-80"
+                        readOnly
                     />
+                    <p className="text-xs text-secondary font-bold italic px-1">
+                        * Auto-detected based on {userCountry} ({ramadanStartDate})
+                    </p>
                 </Card>
 
                 <Card className="flex flex-col gap-4 bg-white shadow-xl">
@@ -92,47 +113,32 @@ export const Settings: React.FC = () => {
                     <div className="space-y-4">
 
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">City</label>
-                            <input
-                                type="text"
-                                value={userCity}
-                                onChange={(e) => setLocation(e.target.value, userCountry)}
-                                placeholder="Enter City"
-                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner"
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Country</label>
+                            <SearchableSelect
+                                value={localCountry}
+                                options={COUNTRIES}
+                                onChange={handleCountryChange}
+                                placeholder="Select Country"
                             />
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">Country</label>
-                            <input
-                                type="text"
-                                value={userCountry}
-                                onChange={(e) => setLocation(userCity, e.target.value)}
-                                placeholder="Enter Country"
-                                className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner"
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground ml-1">City</label>
+                            <SearchableSelect
+                                value={localCity}
+                                options={availableCities}
+                                onChange={setLocalCity}
+                                placeholder="Select City"
                             />
                         </div>
                     </div>
 
-                    <div className="pt-4 space-y-4">
+                    <div className="pt-4">
                         <Button
                             onClick={() => fetchTimings(currentDay)}
                             className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-secondary-foreground hover:bg-card shadow-lg"
                         >
                             <Clock className="w-4 h-4 mr-2" /> GET TIMINGS
                         </Button>
-
-                        {meals[currentDay] && (meals[currentDay].suhoor || meals[currentDay].iftar) && (
-                            <div className="grid grid-cols-2 gap-4 bg-background p-4 rounded-2xl border-2 border-dashed border-secondary/30">
-                                <div className="text-center">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Suhur</div>
-                                    <div className="text-lg font-black text-foreground">{meals[currentDay].suhoor || '--:--'}</div>
-                                </div>
-                                <div className="text-center border-l-2 border-secondary/20">
-                                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Iftar</div>
-                                    <div className="text-lg font-black text-foreground">{meals[currentDay].iftar || '--:--'}</div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </Card>
 
@@ -245,46 +251,7 @@ export const Settings: React.FC = () => {
                         </div>
                     </div>
                 </Card>
-
-                {/* Data Backup */}
-                <Card className="flex flex-col gap-4 bg-card shadow-xl">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-3 bg-completed/10 rounded-2xl text-completed">
-                            <Download className="w-6 h-6" />
-                        </div>
-                        <h3 className="text-xl font-black text-card-foreground">Cloud Backup</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="bg-background p-6 rounded-2xl border-2 border-dashed border-border/60 space-y-4 shadow-inner">
-                            <p className="text-xs text-muted-foreground font-black uppercase tracking-widest leading-relaxed">Safety first: Keep your spiritual progress backed up locally.</p>
-                            <Button variant="ghost" onClick={handleExport} className="w-full rounded-xl font-black py-7 border-2 border-border bg-card hover:bg-completed hover:text-white hover:border-completed transition-all shadow-sm">
-                                <Download className="w-5 h-5 mr-2" /> EXPORT JSON
-                            </Button>
-                        </div>
-
-                        <div className="bg-background p-6 rounded-2xl border-2 border-dashed border-border/60 space-y-4 shadow-inner">
-                            <p className="text-xs text-muted-foreground font-black uppercase tracking-widest leading-relaxed">Returning after a break? Restore your journey here.</p>
-                            <label className="block">
-                                <input type="file" accept=".json" onChange={handleImport} className="hidden" id="import-input" />
-                                <Button variant="ghost" className="w-full rounded-xl font-black py-7 cursor-pointer border-2 border-border bg-card hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all shadow-sm" onClick={() => document.getElementById('import-input')?.click()}>
-                                    <Upload className="w-5 h-5 mr-2" /> IMPORT JSON
-                                </Button>
-                            </label>
-                        </div>
-                    </div>
-                </Card>
             </div>
-
-            <Card className="border-missed/30 bg-missed/5 p-8 flex flex-col md:flex-row items-center justify-between gap-6 rounded-[2.5rem]">
-                <div className="space-y-2 text-center md:text-left">
-                    <h3 className="text-2xl font-black text-missed">Danger Zone</h3>
-                    <p className="text-sm text-missed/80 font-bold uppercase tracking-wider">Reset all tracking data forever</p>
-                </div>
-                <Button variant="danger" onClick={() => setShowResetModal(true)} className="rounded-2xl px-10 py-6 font-black shadow-xl shadow-missed/20">
-                    <Trash2 className="w-6 h-6 mr-3" /> WIPE EVERYTHING
-                </Button>
-            </Card>
 
             {/* Add Alarm Modal */}
             <Modal isOpen={showAddAlarm} onClose={() => setShowAddAlarm(false)} title="Set Reminder" size="sm">
@@ -306,23 +273,12 @@ export const Settings: React.FC = () => {
                         </div>
                         <div className="grid gap-2">
                             <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Time</label>
-                            <input type="time" value={newAlarm.time} onChange={e => setNewAlarm({ ...newAlarm, time: e.target.value })} className="w-full px-5 py-3 rounded-2xl border-2 border-border bg-background focus:border-primary focus:outline-none font-bold text-xl" />
+                            <input type="time" value={newAlarm.time} onChange={e => setNewAlarm({ ...newAlarm, time: e.target.value })} className="w-full px-5 py-3 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] bg-background focus:border-primary focus:outline-none font-bold text-xl" />
                         </div>
                     </div>
                     <div className="flex gap-3 pt-4">
                         <Button variant="ghost" onClick={() => setShowAddAlarm(false)} className="flex-1 rounded-2xl py-4 font-bold">Cancel</Button>
                         <Button onClick={handleAddAlarm} className="flex-1 rounded-2xl py-4 font-bold">Save Alarm</Button>
-                    </div>
-                </div>
-            </Modal>
-
-            {/* Reset Modal */}
-            <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Are you absolutely sure?" size="sm">
-                <div className="space-y-6">
-                    <p className="text-muted-foreground font-semibold leading-relaxed">This will erase your entire 30-day journey. This action is irreversible.</p>
-                    <div className="flex gap-3">
-                        <Button variant="ghost" onClick={() => setShowResetModal(false)} className="flex-1 rounded-2xl">Cancel</Button>
-                        <Button variant="danger" onClick={() => { resetAllData(); setShowResetModal(false); }} className="flex-1 rounded-2xl shadow-lg">Confirm Wipe</Button>
                     </div>
                 </div>
             </Modal>

@@ -24,14 +24,7 @@ export const ProgressHeart: React.FC = () => {
         return (completedTasks / 7) * 100;
     };
 
-    const dayColors = [
-        '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
-        '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
-        '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40',
-        '#FF6E40', '#f44336', '#e91e63', '#9c27b0', '#673ab7',
-        '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',
-        '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800'
-    ];
+    const singleHeartColor = '#FF5252'; // Consistent coral red color for all hearts
 
     // Generate 30 stable positions in a heart shape
     const heartBeads = useMemo(() => {
@@ -80,7 +73,7 @@ export const ProgressHeart: React.FC = () => {
                 x: 250 + point.x * scale,
                 y: 250 - point.y * scale, // invert y for correct orientation
                 day: i + 1,
-                color: dayColors[i % dayColors.length],
+                color: singleHeartColor, // Use single color for all
                 progress: getDailyProgress(i + 1)
             });
         }
@@ -109,17 +102,22 @@ export const ProgressHeart: React.FC = () => {
     if (!isMounted) {
         // Render a placeholder or empty structure during SSR
         return (
-            <div className="relative w-full aspect-square max-w-2xl mx-auto rounded-[3.5rem] bg-[#fdfaf5] p-6 notebook-border shadow-2xl overflow-hidden group flex flex-col">
-                <div className="flex-1 relative flex items-center justify-center">
-                    <div className="animate-pulse w-full h-full bg-muted/5 rounded-full" />
-                </div>
+            <div className="relative w-full aspect-square flex items-center justify-center p-6 overflow-hidden">
+                <div className="animate-pulse w-full h-full bg-muted/5 rounded-full" />
             </div>
         );
     }
 
     return (
-        <div className="relative w-full aspect-square max-w-2xl mx-auto rounded-[3.5rem] bg-[#fdfaf5] p-6 notebook-border shadow-2xl overflow-hidden group flex flex-col">
-            <div className="flex-1 relative">
+        <div className="relative w-full aspect-square max-w-[400px] mx-auto flex flex-col items-center justify-center p-6 overflow-hidden group">
+            {/* Creative Title */}
+            <div className="absolute top-4 left-0 w-full flex flex-col items-center justify-center z-10 pointer-events-none">
+                <h3 className="text-2xl font-black italic tracking-tighter text-foreground opacity-20 uppercase">Ramadan</h3>
+                <div className="h-[2px] w-12 bg-secondary/30 -mt-1 mb-1" />
+                <h2 className="text-4xl font-black italic tracking-tighter gradient-text underline decoration-secondary/30 decoration-2 underline-offset-4">JOURNEY</h2>
+            </div>
+
+            <div className="flex-1 relative flex items-center justify-center w-full h-full mt-12">
                 <svg viewBox="0 0 500 500" className="w-full h-full drop-shadow-xl">
                     <defs>
                         {heartBeads.map((b) => (
@@ -131,6 +129,17 @@ export const ProgressHeart: React.FC = () => {
                         <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
                             <feGaussianBlur stdDeviation="4" result="blur" />
                             <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <filter id="drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+                            <feOffset dx="0" dy="2" result="offsetblur" />
+                            <feComponentTransfer>
+                                <feFuncA type="linear" slope="0.3" />
+                            </feComponentTransfer>
+                            <feMerge>
+                                <feMergeNode />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
                         </filter>
                     </defs>
 
@@ -157,23 +166,13 @@ export const ProgressHeart: React.FC = () => {
                                 className={`transition-all duration-300 ease-in-out ${isToday ? 'cursor-pointer hover:scale-110' : 'cursor-not-allowed opacity-60'}`}
                                 style={{ transformOrigin: `${b.x}px ${b.y}px` }}
                             >
-                                {/* Shadow backing */}
-                                <circle
-                                    cx={b.x}
-                                    cy={b.y + 2}
-                                    r={radius}
-                                    fill="rgba(62, 39, 35, 0.1)"
-                                />
-
-                                {/* Main Bead */}
+                                {/* Main Bead with shadow filter */}
                                 <circle
                                     cx={b.x}
                                     cy={b.y}
                                     r={radius}
                                     fill={isFuture ? 'white' : `url(#fill-${b.day})`}
-                                    stroke={isToday ? b.color : '#3e2723'}
-                                    strokeWidth={isToday ? 4 : 1.5}
-                                    strokeOpacity={isFuture ? 0.2 : 0.8}
+                                    filter="url(#drop-shadow)"
                                 />
 
                                 {/* Glow for today */}
@@ -183,7 +182,7 @@ export const ProgressHeart: React.FC = () => {
                                         cy={b.y}
                                         r={radius + 5}
                                         fill="none"
-                                        stroke={b.color}
+                                        stroke={singleHeartColor}
                                         strokeWidth={2}
                                         strokeOpacity={0.4}
                                         filter="url(#soft-glow)"
@@ -220,13 +219,13 @@ export const ProgressHeart: React.FC = () => {
 
             </div>
             {/* Legend - Moved to a side or bottom area that doesn't overlap */}
-            <div className="absolute bottom-4 left-0 w-full flex justify-center gap-8 py-2 bg-white/40 border-t border-[#3e2723]/5 ">
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border border-[#3e2723] bg-white opacity-60" />
+            <div className="absolute bottom-4 mt-20 left-0 w-full flex justify-center gap-8 py-2 bg-white/40 border-t border-[#3e2723]/5 ">
+                <div className="flex mt-2 items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-white opacity-60 shadow-md" />
                     <span className="text-[8px] font-black uppercase tracking-widest text-[#3e2723]/60">Locked</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-secondary bg-white animate-pulse" />
+                    <div className="w-3 h-3 rounded-full bg-secondary shadow-lg animate-pulse" />
                     <span className="text-[8px] font-black uppercase tracking-widest text-[#3e2723]">Active</span>
                 </div>
             </div>

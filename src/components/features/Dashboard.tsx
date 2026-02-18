@@ -85,7 +85,7 @@ export const Dashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                 {/* 1. Progress Heart */}
-                <div className="relative p-6 notebook-border rounded-[3rem] bg-card shadow-2xl flex flex-col justify-center min-h-[380px]">
+                <div className="relative p-6 notebook-border rounded-[3rem] bg-card shadow-2xl flex flex-col justify-center min-h-[320px]">
                     <div className="absolute inset-0 islamic-pattern opacity-5 pointer-events-none" />
                     <ProgressHeart />
                 </div>

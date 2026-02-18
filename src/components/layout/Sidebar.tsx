@@ -28,7 +28,6 @@ const menuItems = [
     { id: 'ramadan-tracker', label: 'Ramadan Tracker', icon: Calendar },
     { id: 'quran-tracker', label: 'Quran Tracker', icon: BookOpen },
     { id: 'fasting-tracker', label: 'Fasting Tracker', icon: Heart },
-    { id: 'habits', label: 'Habits', icon: CheckSquare },
     { id: 'challenge', label: '30-Day Challenge', icon: Trophy },
     { id: 'meals', label: 'Meal Planner', icon: UtensilsCrossed },
     { id: 'duas', label: 'Duas', icon: Sparkles },

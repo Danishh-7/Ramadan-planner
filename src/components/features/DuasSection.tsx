@@ -8,10 +8,14 @@ import { Modal } from '../ui/Modal';
 import { Heart, Plus, Trash2, Sparkles, BookOpen } from 'lucide-react';
 
 export const DuasSection: React.FC = () => {
-    const { duas, addDua, toggleFavoriteDua, deleteDua } = useRamadanStore();
+    const { duas, fetchDuas, duasLoading, addDua, toggleFavoriteDua, deleteDua } = useRamadanStore();
     const [showAddModal, setShowAddModal] = useState(false);
     const [filter, setFilter] = useState('all');
     const [newDua, setNewDua] = useState({ title: '', arabic: '', transliteration: '', translation: '' });
+
+    React.useEffect(() => {
+        fetchDuas();
+    }, []);
 
     const categories = [
         { id: 'all', label: 'All Duas', icon: BookOpen },
@@ -28,7 +32,10 @@ export const DuasSection: React.FC = () => {
     return (
         <div className="space-y-12 animate-fade-in pb-12 font-serif text-[#3e2723]">
             <div className="text-center space-y-3">
-                <h1 className="text-5xl font-black italic tracking-tighter gradient-text underline decoration-secondary decoration-4">Supplications</h1>
+                <div className="flex items-center justify-center gap-4">
+                    <h1 className="text-5xl font-black italic tracking-tighter gradient-text underline decoration-secondary decoration-4">Supplications</h1>
+                    {duasLoading && <Sparkles className="w-6 h-6 animate-spin text-secondary" />}
+                </div>
                 <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">"Call upon Me; I will respond to you."</p>
             </div>
 
@@ -91,15 +98,15 @@ export const DuasSection: React.FC = () => {
                     <div className="grid gap-6">
                         <div className="space-y-2">
                             <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Supplication Title</label>
-                            <input value={newDua.title} onChange={(e) => setNewDua({ ...newDua, title: e.target.value })} className="w-full px-6 py-4 rounded-2xl border-2 border-border font-black focus:border-[#4a342e] outline-none" />
+                            <input value={newDua.title} onChange={(e) => setNewDua({ ...newDua, title: e.target.value })} className="w-full px-6 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] font-black focus:border-[#4a342e] outline-none" />
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Arabic Text</label>
-                            <textarea value={newDua.arabic} onChange={(e) => setNewDua({ ...newDua, arabic: e.target.value })} className="w-full h-32 px-6 py-4 rounded-2xl border-2 border-border text-2xl text-right focus:border-[#4a342e] outline-none" dir="rtl" />
+                            <textarea value={newDua.arabic} onChange={(e) => setNewDua({ ...newDua, arabic: e.target.value })} className="w-full h-32 px-6 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] text-2xl text-right focus:border-[#4a342e] outline-none" dir="rtl" />
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Translation</label>
-                            <textarea value={newDua.translation} onChange={(e) => setNewDua({ ...newDua, translation: e.target.value })} className="w-full h-32 px-6 py-4 rounded-2xl border-2 border-border font-bold focus:border-[#4a342e] outline-none" />
+                            <textarea value={newDua.translation} onChange={(e) => setNewDua({ ...newDua, translation: e.target.value })} className="w-full h-32 px-6 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] font-bold focus:border-[#4a342e] outline-none" />
                         </div>
                     </div>
                     <div className="flex gap-4">

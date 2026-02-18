@@ -138,7 +138,7 @@ export const QuranTracker: React.FC = () => {
                             onChange={(e) =>
                                 updateDailyPages(currentDay, parseInt(e.target.value) || 0)
                             }
-                            className="w-28 bg-white-500/10 border-2 border-black rounded-2xl px-4 py-5 text-4xl font-black text-center text-black focus:ring-2 focus:ring-secondary outline-none focus:bg-white/20 transition-all"
+                            className="w-28 bg-white-500/10 border-2 border-black dark:border-white/50 rounded-2xl px-4 py-5 text-4xl font-black text-center text-black dark:text-white focus:ring-2 focus:ring-secondary outline-none focus:bg-white/20 transition-all [color-scheme:dark]"
                         />
                     </div>
                 </div>
@@ -180,7 +180,7 @@ export const QuranTracker: React.FC = () => {
                                 max="30"
                                 value={bookmarkPara}
                                 onChange={(e) => setBookmarkPara(e.target.value)}
-                                className="w-full px-6 py-4 rounded-2xl border-2 border-border font-black text-2xl focus:border-primary focus:outline-none"
+                                className="w-full px-6 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] font-black text-2xl focus:border-primary focus:outline-none"
                             />
                         </div>
                         <div className="space-y-2">
@@ -190,7 +190,7 @@ export const QuranTracker: React.FC = () => {
                                 min="1"
                                 value={bookmarkAya}
                                 onChange={(e) => setBookmarkAya(e.target.value)}
-                                className="w-full px-6 py-4 rounded-2xl border-2 border-border font-black text-2xl focus:border-primary focus:outline-none"
+                                className="w-full px-6 py-4 rounded-2xl border-2 border-border dark:border-white dark:[color-scheme:dark] font-black text-2xl focus:border-primary focus:outline-none"
                             />
                         </div>
                     </div>

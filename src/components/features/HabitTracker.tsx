@@ -66,12 +66,12 @@ export const HabitTracker: React.FC = () => {
                         value={newHabitName}
                         onChange={(e) => setNewHabitName(e.target.value)}
                         placeholder="Habit name..."
-                        className="flex-1 px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:ring-2 focus:ring-secondary outline-none font-bold placeholder:italic"
+                        className="flex-1 px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:ring-2 focus:ring-secondary outline-none font-bold placeholder:italic [color-scheme:dark]"
                     />
                     <select
                         value={newHabitTime}
                         onChange={(e) => setNewHabitTime(e.target.value as any)}
-                        className="px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white font-bold outline-none focus:ring-2 focus:ring-secondary [&>option]:text-[#4a342e] [&>option]:font-bold"
+                        className="px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-white font-bold outline-none focus:ring-2 focus:ring-secondary [&>option]:text-[#4a342e] [&>option]:font-bold [color-scheme:dark]"
                     >
                         <option value="morning">Morning</option>
                         <option value="afternoon">Afternoon</option>

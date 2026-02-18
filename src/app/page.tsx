@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRamadanStore } from '@/store/store';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
 import { Dashboard } from '@/components/features/Dashboard';
@@ -17,6 +18,11 @@ import { NotebookPlanner } from '@/components/features/NotebookPlanner';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('dashboard');
+  const { syncRamadanDay } = useRamadanStore();
+
+  useEffect(() => {
+    syncRamadanDay();
+  }, [syncRamadanDay]);
 
   const renderView = () => {
     switch (currentView) {
