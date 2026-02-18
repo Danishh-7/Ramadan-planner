@@ -61,7 +61,6 @@ export interface Note {
 
 export interface MealPlan {
     suhoor: string;
-    khatamSehri?: string; // Fajr time - end of Sehri
     iftar: string;
 }
 
@@ -86,6 +85,8 @@ interface RamadanStore {
     notificationsEnabled: boolean;
     userCity: string;
     userCountry: string;
+    latitude: number | null;
+    longitude: number | null;
 
     // Daily Activities (30 days)
     prayers: Record<number, DailyPrayers>;
@@ -99,7 +100,6 @@ interface RamadanStore {
     juzCompleted: boolean[];
     challenges: Challenge[];
     duas: Dua[];
-    duasLoading: boolean;
     notes: Note[];
     alarms: Alarm[];
 
@@ -118,16 +118,16 @@ interface RamadanStore {
     setCurrentDay: (day: number) => void;
     setTheme: (theme: 'light' | 'dark') => void;
     setNotificationsEnabled: (enabled: boolean) => void;
-    setLocation: (city: string, country: string) => Promise<void>;
+    setLocation: (city: string, country: string) => void;
+    detectLocation: () => Promise<void>;
     fetchTimings: (day: number) => Promise<void>;
-    fetchDuas: () => Promise<void>;
+    syncRamadanDay: () => void;
 
     // Quran Actions
     setQuranBookmark: (para: number, aya: number) => void;
     completeQuranJourneys: () => void;
     resetJuzForNewJourney: () => void;
     setQuranCompletionCount: (count: number) => void;
-    syncRamadanDay: () => void;
 
     // Activity Actions
     updatePrayerStatus: (day: number, prayer: keyof DailyPrayers, status: PrayerStatus | boolean) => void;
@@ -186,48 +186,21 @@ const defaultDuas: Dua[] = [
     { id: '3', title: 'Dua for Laylatul Qadr', arabic: 'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي', transliteration: 'Allahumma innaka...', translation: 'O Allah, You are Forgiving...', isCustom: false, isFavorite: false, isHighlighted: true },
 ];
 
-const defaultChallenges: Challenge[] = [
-    { id: '1', day: 1, task: 'Read and understand Surah Al-Fatiha with translation', completed: false },
-    { id: '2', day: 2, task: 'Pray all 5 daily prayers on time', completed: false },
-    { id: '3', day: 3, task: 'Give charity to someone in need', completed: false },
-    { id: '4', day: 4, task: 'Memorize a new short Surah', completed: false },
-    { id: '5', day: 5, task: 'Make dua for your parents after every prayer', completed: false },
-    { id: '6', day: 6, task: 'Read Surah Al-Kahf and reflect on its lessons', completed: false },
-    { id: '7', day: 7, task: 'Fast with full consciousness and gratitude', completed: false },
-    { id: '8', day: 8, task: 'Seek forgiveness from someone you may have wronged', completed: false },
-    { id: '9', day: 9, task: 'Spend 30 minutes in dhikr and remembrance of Allah', completed: false },
-    { id: '10', day: 10, task: 'Call a family member and strengthen your bond', completed: false },
-    { id: '11', day: 11, task: 'Read about the life of Prophet Muhammad (PBUH)', completed: false },
-    { id: '12', day: 12, task: 'Donate to a charitable cause', completed: false },
-    { id: '13', day: 13, task: 'Pray Tahajjud and make sincere dua', completed: false },
-    { id: '14', day: 14, task: 'Reflect on your blessings and write them down', completed: false },
-    { id: '15', day: 15, task: 'Help someone without expecting anything in return', completed: false },
-    { id: '16', day: 16, task: 'Read Tafsir of your favorite Surah', completed: false },
-    { id: '17', day: 17, task: 'Make istighfar 100 times today', completed: false },
-    { id: '18', day: 18, task: 'Invite someone to break fast with you', completed: false },
-    { id: '19', day: 19, task: 'Recite Ayatul Kursi after every prayer', completed: false },
-    { id: '20', day: 20, task: 'Spend quality time with your family', completed: false },
-    { id: '21', day: 21, task: 'Seek Laylatul Qadr - increase worship and dua', completed: false },
-    { id: '22', day: 22, task: 'Make dua for the Ummah and those suffering', completed: false },
-    { id: '23', day: 23, task: 'Seek Laylatul Qadr - recite Quran with reflection', completed: false },
-    { id: '24', day: 24, task: 'Give Sadaqah in secret', completed: false },
-    { id: '25', day: 25, task: 'Seek Laylatul Qadr - pray Tahajjud and make dua', completed: false },
-    { id: '26', day: 26, task: 'Forgive everyone who has wronged you', completed: false },
-    { id: '27', day: 27, task: 'Seek Laylatul Qadr - maximize worship tonight', completed: false },
-    { id: '28', day: 28, task: 'Plan how to maintain good habits after Ramadan', completed: false },
-    { id: '29', day: 29, task: 'Make sincere tawbah and ask for Jannah', completed: false },
-    { id: '30', day: 30, task: 'Thank Allah for completing Ramadan and prepare for Eid', completed: false },
-];
+const defaultChallenges: Challenge[] = Array.from({ length: 30 }, (_, i) => ({
+    id: (i + 1).toString(), day: i + 1, task: `Day ${i + 1} Challenge`, completed: false
+}));
 
 export const useRamadanStore = create<RamadanStore>()(
     persist(
         (set, get) => ({
-            ramadanStartDate: '2026-02-19', // Default for India, will be auto-fetched via API
+            ramadanStartDate: new Date().toISOString().split('T')[0],
             currentDay: 1,
             theme: 'light',
             notificationsEnabled: true,
             userCity: 'Dadri',
             userCountry: 'India',
+            latitude: null,
+            longitude: null,
             prayers: {},
             fasting: {},
             tasks: {},
@@ -237,7 +210,6 @@ export const useRamadanStore = create<RamadanStore>()(
             juzCompleted: Array(30).fill(false),
             challenges: defaultChallenges,
             duas: defaultDuas,
-            duasLoading: false,
             notes: [],
             alarms: [],
             activeAlarm: null,
@@ -251,80 +223,87 @@ export const useRamadanStore = create<RamadanStore>()(
             setCurrentDay: (day) => set({ currentDay: day }),
             setTheme: (theme) => set({ theme }),
             setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
-            setLocation: async (city, country) => {
-                try {
-                    const { getRamadanStartDate } = await import('@/services/aladhanApi');
-                    const startDate = await getRamadanStartDate(city, country);
-                    console.log(startDate, "date");
-                    set({ userCity: city, userCountry: country, ramadanStartDate: startDate });
-                    get().syncRamadanDay();
-                } catch (error) {
-                    console.error('Failed to fetch Ramadan start date:', error);
-                    set({ userCity: city, userCountry: country });
-                }
-            },
+            setLocation: (city, country) => set({ userCity: city, userCountry: country }),
+
             syncRamadanDay: () => {
                 const { ramadanStartDate } = get();
                 const start = new Date(ramadanStartDate);
-                start.setHours(0, 0, 0, 0);
                 const now = new Date();
+
+                // Reset hours to compare just the dates
+                start.setHours(0, 0, 0, 0);
                 now.setHours(0, 0, 0, 0);
+
                 const diffTime = now.getTime() - start.getTime();
                 const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                const currentDay = Math.max(1, Math.min(30, diffDays + 1));
-                // Only update if it helps or if date is valid within range
-                if (diffDays >= 0 && diffDays < 30) {
+
+                const currentDay = diffDays + 1;
+
+                if (currentDay >= 1 && currentDay <= 30) {
                     set({ currentDay });
-                } else if (diffDays < 0) {
-                    set({ currentDay: 1 }); // Before Ramadan
+                } else if (currentDay < 1) {
+                    set({ currentDay: 1 });
+                } else {
+                    set({ currentDay: 30 });
+                }
+            },
+
+            detectLocation: async () => {
+                const { getRamadanStartDate, getSehriIftarTimings } = await import('@/services/aladhanApi');
+
+                if (!navigator.geolocation) {
+                    console.log('Geolocation is not supported by your browser');
+                    return;
+                }
+
+                try {
+                    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                    });
+
+                    const { latitude, longitude } = position.coords;
+
+                    // Update state with location
+                    set({ latitude, longitude });
+
+                    // Fetch Ramadan Start Date for this location
+                    const startDate = await getRamadanStartDate(undefined, undefined, latitude, longitude);
+                    set({ ramadanStartDate: startDate });
+
+                    // Re-sync current day based on new start date
+                    get().syncRamadanDay();
+
+                    // Refresh timings for current day if active
+                    const currentDay = get().currentDay;
+                    // We can also fetch the user's city/country name using reverse geocoding here if desired, 
+                    // but for now we'll stick to coordinates for calculations.
+
+                    // Fetch timings for validation
+                    get().fetchTimings(currentDay);
+
+                } catch (error) {
+                    console.error('Error detecting location:', error);
+                    // Fallback to default/stored city if location fails
                 }
             },
 
             fetchTimings: async (day) => {
-                const { userCity, userCountry } = get();
+                const { userCity, userCountry, latitude, longitude } = get();
                 const { getSehriIftarTimings } = await import('@/services/aladhanApi');
-                const timings = await getSehriIftarTimings(userCity, userCountry);
+
+                // Prioritize coordinates if available
+                const timings = await getSehriIftarTimings(userCity, userCountry, latitude || undefined, longitude || undefined);
+
                 if (timings) {
                     set((state) => ({
                         meals: {
                             ...state.meals,
                             [day]: {
                                 suhoor: timings.sehri,
-                                khatamSehri: timings.khatamSehri,
                                 iftar: timings.iftar
                             }
                         }
                     }));
-                }
-            },
-
-            fetchDuas: async () => {
-                if (get().duasLoading) return;
-                set({ duasLoading: true });
-                try {
-                    const { fetchAuthenticDuas } = await import('@/services/duaApi');
-                    const authenticDuas = await fetchAuthenticDuas();
-
-                    set((state) => {
-                        // 1. Create a map of existing duas by ID for quick access
-                        const duaMap = new Map(state.duas.map(d => [d.id, d]));
-
-                        // 2. Process authentic duas: unique them and merge into map
-                        authenticDuas.forEach(newDua => {
-                            const existing = duaMap.get(newDua.id);
-                            if (!existing || (!existing.arabic && newDua.arabic)) {
-                                duaMap.set(newDua.id, { ...existing, ...newDua });
-                            }
-                        });
-
-                        return {
-                            duas: Array.from(duaMap.values()),
-                            duasLoading: false
-                        };
-                    });
-                } catch (error) {
-                    console.error('Failed to fetch authentic duas:', error);
-                    set({ duasLoading: false });
                 }
             },
 

@@ -19,11 +19,12 @@ import { ScrapbookPlanner } from '@/components/features/ScrapbookPlanner';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('dashboard');
-  const { syncRamadanDay } = useRamadanStore();
+  const { syncRamadanDay, detectLocation } = useRamadanStore();
 
   useEffect(() => {
+    detectLocation();
     syncRamadanDay();
-  }, [syncRamadanDay]);
+  }, [detectLocation, syncRamadanDay]);
 
   const renderView = () => {
     switch (currentView) {
