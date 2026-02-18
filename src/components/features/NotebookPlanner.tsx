@@ -41,28 +41,6 @@ export const NotebookPlanner: React.FC = () => {
             <div className="grid grid-cols-1 gap-10">
                 {/* Single Column: Quran & Tasks */}
                 <div className="space-y-10">
-                    {/* Quran Tracker */}
-                    <div className="notebook-border rounded-3xl p-6 sm:p-8 space-y-6 bg-card/50 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <BookOpen className="w-16 h-16" />
-                        </div>
-                        <h2 className="text-xl sm:text-2xl font-black flex items-center gap-3">
-                            <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
-                            Quran Tracker
-                        </h2>
-                        <div className="space-y-6 relative z-10">
-                            <div className="flex items-center justify-between border-b-2 border-dotted border-border pb-2 group">
-                                <span className="font-bold text-muted-foreground uppercase text-xs sm:text-sm tracking-widest">Pages Read Today</span>
-                                <input
-                                    type="number"
-                                    value={quranPages}
-                                    onChange={(e) => updateDailyPages(currentDay, parseInt(e.target.value) || 0)}
-                                    className="bg-transparent text-right font-black text-xl sm:text-2xl w-16 sm:w-20 focus:outline-none focus:text-primary transition-colors dark:[color-scheme:dark]"
-                                />
-                            </div>
-                            <p className="text-xs text-muted-foreground font-medium italic">&quot;The Quran is a guidance for mankind and clear proofs for the guidance and the criterion.&quot;</p>
-                        </div>
-                    </div>
 
                     {/* To-Do List - Mobile Responsive */}
                     <div className="bg-primary text-primary-foreground rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 shadow-2xl relative notebook-shadow border border-white/10">

@@ -56,6 +56,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
         `}
             >
                 <div className="p-8 border-b-2 border-dotted border-border/40">
+                    <p className="text-[20px] text-center text-muted-foreground font-black tracking-[0.2em]" dir="rtl">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                    </p>
                     <div className="flex flex-col items-center">
                         <h1 className="text-4xl font-black italic tracking-tighter text-foreground font-serif">Ramadan</h1>
                         <p className="text-[10px] uppercase font-black tracking-[0.4em] text-muted-foreground mt-1">
@@ -97,9 +100,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                 </nav>
 
                 <div className="p-6 border-t-2 border-dotted border-border/40 bg-muted/10">
-                    <p className="text-[10px] text-center text-muted-foreground font-black tracking-[0.2em]" dir="rtl">
-                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-                    </p>
                 </div>
             </aside>
 

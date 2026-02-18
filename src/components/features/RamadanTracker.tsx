@@ -58,11 +58,11 @@ export const RamadanTracker: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-center gap-8 bg-card/40 p-6 rounded-[2.5rem] notebook-border mx-auto max-w-sm">
-                <Button variant="ghost" size="sm" onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))} disabled={selectedDay === 1} className="rounded-full w-10 h-10 p-0"><ChevronLeft className="w-6 h-6" /></Button>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedDay(Math.max(1, selectedDay - 1))} disabled={selectedDay === 1} className="rounded-full w-20 h-20 p-0"><ChevronLeft className="w-8 h-8" /></Button>
                 <div className="text-center">
                     <h2 className="text-3xl font-black italic">Day {selectedDay}</h2>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedDay(Math.min(30, selectedDay + 1))} disabled={selectedDay === 30} className="rounded-full w-10 h-10 p-0"><ChevronRight className="w-6 h-6" /></Button>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedDay(Math.min(30, selectedDay + 1))} disabled={selectedDay === 30} className="rounded-full w-20 h-20 p-0"><ChevronRight className="w-8 h-8" /></Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

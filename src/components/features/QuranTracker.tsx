@@ -121,9 +121,9 @@ export const QuranTracker: React.FC = () => {
 
             <Card className="bg-[#4a342e] text-white p-10 rounded-[3rem] notebook-shadow space-y-8 border-none relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-8 opacity-5">
-                    <BookOpen className="w-40 h-40" />
+                    <BookOpen className="w-20 h-20" />
                 </div>
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8 border-b border-white/10 pb-8 relative z-10">
+                {/* <div className="flex flex-col md:flex-row items-center justify-between gap-8 border-b border-white/10 pb-8 relative z-10">
                     <div className="space-y-2 text-center md:text-left">
                         <h3 className="text-3xl font-black italic text-secondary/90">Daily Progress</h3>
                     </div>
@@ -141,7 +141,7 @@ export const QuranTracker: React.FC = () => {
                             className="w-28 bg-white-500/10 border-2 border-black dark:border-white/50 rounded-2xl px-4 py-5 text-4xl font-black text-center text-black dark:text-white focus:ring-2 focus:ring-secondary outline-none focus:bg-white/20 transition-all [color-scheme:dark]"
                         />
                     </div>
-                </div>
+                </div> */}
                 <div className="flex justify-center relative z-10">
                     <Button
                         variant="ghost"
