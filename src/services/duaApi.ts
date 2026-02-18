@@ -81,7 +81,8 @@ export const fetchAuthenticDuas = async () => {
 
 export const fetchRamadanDhikr = async (): Promise<ApiDua[]> => {
     try {
-        const response = await fetch(`${BASE_URL}/categories/ramadan`, {
+        // 'ramadan' category is currently unavailable, usage 'selected-dua' as fallback
+        const response = await fetch(`${BASE_URL}/categories/selected-dua`, {
             headers: {
                 'Accept-Language': 'en'
             }

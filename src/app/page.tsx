@@ -14,8 +14,8 @@ import { MealPlanner } from '@/components/features/MealPlanner';
 import { DuasSection } from '@/components/features/DuasSection';
 import { NotesSection } from '@/components/features/NotesSection';
 import { Settings } from '@/components/features/Settings';
-import { NotebookPlanner } from '@/components/features/NotebookPlanner';
-import { ScrapbookPlanner } from '@/components/features/ScrapbookPlanner';
+
+import { AuthSyncProvider } from "@/components/providers/AuthSyncProvider";
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('dashboard');
@@ -26,14 +26,13 @@ export default function Home() {
     syncRamadanDay();
   }, [detectLocation, syncRamadanDay]);
 
+  // Determine if we should show the sidebar (all views except auth pages which are handled by middleware/layout)
+  // detailed layout is handled in specific components, improving separation if needed.
+
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard />;
-      case 'scrapbook-planner':
-        return <ScrapbookPlanner />;
-      case 'notebook-planner':
-        return <NotebookPlanner />;
       case 'ramadan-tracker':
         return <RamadanTracker />;
       case 'quran-tracker':
@@ -59,6 +58,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen bg-background islamic-pattern">
+      <AuthSyncProvider />
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
       <div className="flex-1 flex flex-col lg:ml-0 overflow-hidden">

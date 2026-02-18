@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRamadanStore } from '@/store/store';
 import { Moon, Sun, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
+import { UserButton } from "@clerk/nextjs";
 
 export const Header: React.FC = () => {
     const { currentDay, ramadanStartDate, theme, setTheme } = useRamadanStore();
@@ -51,18 +52,26 @@ export const Header: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Theme Toggle */}
-                <button
-                    onClick={toggleTheme}
-                    className="p-3.5 rounded-2xl bg-muted/50 hover:bg-primary/10 hover:text-primary border border-border/50 transition-all duration-300 shadow-inner group"
-                    aria-label="Toggle theme"
-                >
-                    {theme === 'light' ? (
-                        <Moon className="w-5 h-5 transform group-hover:-rotate-12 transition-transform duration-300" />
-                    ) : (
-                        <Sun className="w-5 h-5 transform group-hover:rotate-45 transition-transform duration-300" />
-                    )}
-                </button>
+                {/* Theme Toggle & User Profile */}
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={toggleTheme}
+                        className="p-3.5 rounded-2xl bg-muted/50 hover:bg-primary/10 hover:text-primary border border-border/50 transition-all duration-300 shadow-inner group"
+                        aria-label="Toggle theme"
+                    >
+                        {theme === 'light' ? (
+                            <Moon className="w-5 h-5 transform group-hover:-rotate-12 transition-transform duration-300" />
+                        ) : (
+                            <Sun className="w-5 h-5 transform group-hover:rotate-45 transition-transform duration-300" />
+                        )}
+                    </button>
+
+                    <UserButton afterSignOutUrl="/sign-in" appearance={{
+                        elements: {
+                            avatarBox: "w-10 h-10 rounded-2xl border-2 border-primary/20 hover:border-primary/50 transition-colors"
+                        }
+                    }} />
+                </div>
             </div>
         </header>
     );

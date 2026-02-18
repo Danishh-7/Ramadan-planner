@@ -82,14 +82,14 @@ export const NotesSection: React.FC = () => {
                     {!editingNote && (
                         <div className="space-y-2">
                             <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Journey Day</label>
-                            <select value={selectedDay} onChange={(e) => setSelectedDay(Number(e.target.value))} className="w-full px-6 py-4 rounded-2xl border-2 border-border font-black text-xl focus:border-[#4a342e] outline-none">
-                                {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => <option key={day} value={day}>Day {day}</option>)}
+                            <select value={selectedDay} onChange={(e) => setSelectedDay(Number(e.target.value))} className="w-full px-6 py-4 rounded-2xl border-2 border-border font-black text-xl focus:border-[#4a342e] outline-none text-foreground bg-transparent">
+                                {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => <option key={day} value={day} className="text-foreground bg-background">Day {day}</option>)}
                             </select>
                         </div>
                     )}
                     <div className="space-y-2">
                         <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Your Thoughts</label>
-                        <textarea value={noteContent} onChange={(e) => setNoteContent(e.target.value)} placeholder="What did today teach you about your heart?" className="w-full h-64 px-8 py-6 rounded-[2.5rem] border-2 border-border font-bold text-xl leading-relaxed focus:border-[#4a342e] outline-none resize-none" />
+                        <textarea value={noteContent} onChange={(e) => setNoteContent(e.target.value)} placeholder="What did today teach you about your heart?" className="w-full h-64 px-8 py-6 rounded-[2.5rem] border-2 border-border font-bold text-xl leading-relaxed focus:border-[#4a342e] outline-none resize-none text-foreground bg-transparent" />
                     </div>
                     <div className="flex gap-4">
                         <Button variant="ghost" onClick={() => { setShowAddModal(false); setEditingNote(null); setNoteContent(''); }} className="flex-1 py-6 rounded-2xl font-black">CLOSE</Button>

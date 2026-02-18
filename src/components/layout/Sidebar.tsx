@@ -24,8 +24,6 @@ interface SidebarProps {
 
 const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'scrapbook-planner', label: 'Scrapbook Planner', icon: Sparkles },
-    { id: 'notebook-planner', label: 'Notebook Planner', icon: Sparkles },
     { id: 'ramadan-tracker', label: 'Ramadan Tracker', icon: Calendar },
     { id: 'quran-tracker', label: 'Quran Tracker', icon: BookOpen },
     { id: 'fasting-tracker', label: 'Fasting Tracker', icon: Heart },

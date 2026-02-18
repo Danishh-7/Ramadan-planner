@@ -17,21 +17,25 @@ import { NotificationProvider } from "@/components/providers/NotificationProvide
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AlarmOverlay } from "@/components/ui/AlarmOverlay";
 
+import { ClerkProvider } from "@clerk/nextjs";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={outfit.variable}>
-      <body className={`${outfit.className} antialiased`}>
-        <NotificationProvider>
-          <ThemeProvider>
-            {children}
-            <AlarmOverlay />
-          </ThemeProvider>
-        </NotificationProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning className={outfit.variable}>
+        <body className={`${outfit.className} antialiased`}>
+          <NotificationProvider>
+            <ThemeProvider>
+              {children}
+              <AlarmOverlay />
+            </ThemeProvider>
+          </NotificationProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

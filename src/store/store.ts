@@ -172,6 +172,7 @@ interface RamadanStore {
     resetAllData: () => void;
     exportData: () => string;
     importData: (json: string) => void;
+    syncWithSupabase: (userId: string) => Promise<void>;
 }
 
 const defaultPrayers: DailyPrayers = {
@@ -180,11 +181,9 @@ const defaultPrayers: DailyPrayers = {
     sehri: false, iftar: false,
 };
 
-const defaultDuas: Dua[] = [
-    { id: '1', title: 'Niyyah for Fasting', arabic: 'نَوَيْتُ صَوْمَ غَدٍ عَنْ أَدَاءِ فَرْضِ شَهْرِ رَمَضَانَ هَذِهِ السَّنَةِ لِلَّهِ تَعَالَى', transliteration: 'Nawaitu sauma ghadin...', translation: 'I intend to keep the fast...', isCustom: false, isFavorite: false, isHighlighted: true },
-    { id: '2', title: 'Dua for Iftar', arabic: 'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ', transliteration: 'Dhahaba az-zamau...', translation: 'The thirst has gone...', isCustom: false, isFavorite: false, isHighlighted: true },
-    { id: '3', title: 'Dua for Laylatul Qadr', arabic: 'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي', transliteration: 'Allahumma innaka...', translation: 'O Allah, You are Forgiving...', isCustom: false, isFavorite: false, isHighlighted: true },
-];
+import { HARDCODED_DUAS } from '@/data/duas';
+
+const defaultDuas: Dua[] = HARDCODED_DUAS;
 
 const defaultChallenges: Challenge[] = Array.from({ length: 30 }, (_, i) => ({
     id: (i + 1).toString(), day: i + 1, task: `Day ${i + 1} Challenge`, completed: false
@@ -267,7 +266,8 @@ export const useRamadanStore = create<RamadanStore>()(
                     set({ latitude, longitude });
 
                     // Fetch Ramadan Start Date for this location
-                    const startDate = await getRamadanStartDate(undefined, undefined, latitude, longitude);
+                    const userCountry = get().userCountry;
+                    const startDate = await getRamadanStartDate(undefined, userCountry, latitude, longitude);
                     set({ ramadanStartDate: startDate });
 
                     // Re-sync current day based on new start date
@@ -281,9 +281,25 @@ export const useRamadanStore = create<RamadanStore>()(
                     // Fetch timings for validation
                     get().fetchTimings(currentDay);
 
-                } catch (error) {
-                    console.error('Error detecting location:', error);
-                    // Fallback to default/stored city if location fails
+                } catch (error: any) {
+                    if (error.code) {
+                        switch (error.code) {
+                            case 1:
+                                console.log('User denied location permission. Using default location.');
+                                break;
+                            case 2:
+                                console.log('Location unavailable. Using default location.');
+                                break;
+                            case 3:
+                                console.log('Location request timed out. Using default location.');
+                                break;
+                            default:
+                                console.error('An unknown error occurred detecting location.');
+                        }
+                    } else {
+                        console.error('Error detecting location:', error);
+                    }
+                    // Fallback is implicitly handled as we default to 'Dadri', 'India' in initial state
                 }
             },
 
@@ -294,17 +310,8 @@ export const useRamadanStore = create<RamadanStore>()(
                 // Prioritize coordinates if available
                 const timings = await getSehriIftarTimings(userCity, userCountry, latitude || undefined, longitude || undefined);
 
-                if (timings) {
-                    set((state) => ({
-                        meals: {
-                            ...state.meals,
-                            [day]: {
-                                suhoor: timings.sehri,
-                                iftar: timings.iftar
-                            }
-                        }
-                    }));
-                }
+                // Timings fetched successfully - notifications or other logic can go here
+                // We no longer overwrite 'meals' with timings as that is for user text input
             },
 
             updatePrayerStatus: (day, prayer, status) => {
@@ -404,6 +411,25 @@ export const useRamadanStore = create<RamadanStore>()(
                     const data = JSON.parse(json);
                     set(data);
                 } catch (e) { console.error('Import failed', e); }
+            },
+
+            syncWithSupabase: async (userId: string) => {
+                const { exportData } = get();
+                // Simple debounce or just fire and forget - ideally use a library or custom debounce
+                // For now, we'll just upsert
+                const { supabase } = await import('@/services/supabaseClient');
+
+                try {
+                    await supabase
+                        .from('planner_data')
+                        .upsert({
+                            user_id: userId,
+                            data: JSON.parse(exportData()),
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' });
+                } catch (error) {
+                    console.error('Error syncing to Supabase:', error);
+                }
             },
         }),
         { name: 'ramadan-planner-storage' }

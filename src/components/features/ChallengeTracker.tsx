@@ -44,18 +44,18 @@ export const ChallengeTracker: React.FC = () => {
                                 {challenge.day}
                             </div>
                             <div className="flex-1 space-y-2">
-                                <div className="flex items-start gap-2">
+                                <div className="flex items-center gap-2">
                                     <Checkbox
                                         checked={challenge.completed}
                                         onChange={(checked) => updateChallenge(challenge.day, challenge.task, checked)}
-                                        className="shrink-0 mt-1"
+                                        className="shrink-0"
                                     />
                                     <textarea
-                                        value={challenge.task}
+                                        value={challenge.task === `Day ${challenge.day} Challenge` ? '' : challenge.task}
                                         onChange={(e) => updateChallengeText(challenge.day, e.target.value)}
-                                        placeholder={`Add your challenge for day ${challenge.day}`}
-                                        rows={2}
-                                        className={`w-full bg-transparent border-none focus:ring-0 font-bold p-0 text-xs sm:text-sm transition-all outline-none placeholder:italic placeholder:text-muted-foreground/50 resize-none ${challenge.completed ? 'line-through opacity-50 text-muted-foreground' : 'text-[#4a342e]'}`}
+                                        placeholder={`Add Day ${challenge.day} Challenge`}
+                                        rows={1}
+                                        className={`w-full bg-transparent border-none focus:ring-0 font-bold p-0 text-xs sm:text-sm transition-all outline-none placeholder:italic placeholder:text-muted-foreground/50 resize-none overflow-hidden ${challenge.completed ? 'line-through opacity-50 text-muted-foreground' : 'text-[#4a342e]'}`}
                                     />
                                 </div>
                                 <div className="h-px w-0 group-hover:w-full bg-[#4a342e]/10 transition-all duration-500" />

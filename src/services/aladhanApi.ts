@@ -174,26 +174,40 @@ export async function getRamadanStartDate(city?: string, country?: string, latit
             const timezone = data.data[0]?.meta?.timezone;
             let offsetDays = 0;
 
-            if (timezone === 'Asia/Kolkata') {
+            console.log('Detected Timezone:', timezone);
+
+            if (timezone === 'Asia/Kolkata' || timezone === 'Asia/Calcutta' || (country && country.toLowerCase() === 'india')) {
                 offsetDays = 1; // India is usually +1 day due to moon sighting
             }
 
             // Find first day where Hijri month is Ramadan (month number 9)
+            // Debug: Check the first few entries
+            console.log('Checking calendar for Ramadan start...');
+
             for (const dayData of data.data) {
-                if (dayData.date.hijri.month.number === 9) {
+                // Hijri month number can sometimes be parsed differently or indexed differently
+                // We check for 9 (Ramadan)
+                const hijriMonth = dayData.date.hijri.month.number;
+
+                if (hijriMonth === 9 || hijriMonth === '9') {
                     // Return in YYYY-MM-DD format
                     const greg = dayData.date.gregorian;
                     const month = typeof greg.month === 'object' ? greg.month.number : greg.month;
 
+                    console.log(`Found Ramadan Start: ${greg.day}-${month}-${greg.year} (Hijri Month: ${hijriMonth})`);
+
                     if (offsetDays > 0) {
-                        const date = new Date(`${greg.year}-${month.toString().padStart(2, '0')}-${greg.day.padStart(2, '0')}`);
+                        const date = new Date(`${greg.year}-${String(month).padStart(2, '0')}-${String(greg.day).padStart(2, '0')}`);
                         date.setDate(date.getDate() + offsetDays);
-                        return date.toISOString().split('T')[0];
+                        const offsetDate = date.toISOString().split('T')[0];
+                        console.log(`Applying offset of ${offsetDays} days. New Date: ${offsetDate}`);
+                        return offsetDate;
                     }
 
-                    return `${greg.year}-${month.toString().padStart(2, '0')}-${greg.day.padStart(2, '0')}`;
+                    return `${greg.year}-${String(month).padStart(2, '0')}-${String(greg.day).padStart(2, '0')}`;
                 }
             }
+            console.log('Ramadan start not found in the returned data.');
         }
 
         // Fallback to default if not found in February

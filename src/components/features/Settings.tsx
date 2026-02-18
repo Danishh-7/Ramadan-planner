@@ -8,6 +8,7 @@ import { Modal } from '../ui/Modal';
 import { Calendar as CalendarIcon, Bell, Plus, Clock, Volume2, Trash2 } from 'lucide-react';
 import { useNotifications } from '../providers/NotificationProvider';
 import { SearchableSelect } from '../ui/SearchableSelect';
+import { Toast } from '../ui/Toast';
 import { COUNTRIES, getCitiesForCountry } from '@/data/locations';
 
 export const Settings: React.FC = () => {
@@ -21,6 +22,12 @@ export const Settings: React.FC = () => {
     const { requestPermission } = useNotifications();
     const [showAddAlarm, setShowAddAlarm] = useState(false);
     const [newAlarm, setNewAlarm] = useState({ type: 'General', time: '05:00', day: 1 });
+
+    // UI Loading & Toast States
+    const [isLoadingTimings, setIsLoadingTimings] = useState(false);
+    const [toastState, setToastState] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'loading' }>({
+        visible: false, message: '', type: 'success'
+    });
 
     // Local state for immediate UI updates (prevents API call on every keystroke)
     const [localCity, setLocalCity] = useState(userCity);
@@ -67,6 +74,20 @@ export const Settings: React.FC = () => {
     const handleAddAlarm = () => {
         addAlarm({ ...newAlarm, enabled: true });
         setShowAddAlarm(false);
+    };
+
+    const handleFetchTimings = async () => {
+        setIsLoadingTimings(true);
+        setToastState({ visible: true, message: 'Fetching prayer timings...', type: 'loading' });
+
+        try {
+            await fetchTimings(currentDay);
+            setToastState({ visible: true, message: 'Prayer timings updated successfully!', type: 'success' });
+        } catch (error) {
+            setToastState({ visible: true, message: 'Failed to fetch timings. Please try again.', type: 'error' });
+        } finally {
+            setIsLoadingTimings(false);
+        }
     };
 
     return (
@@ -134,10 +155,12 @@ export const Settings: React.FC = () => {
 
                     <div className="pt-4">
                         <Button
-                            onClick={() => fetchTimings(currentDay)}
-                            className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-secondary-foreground hover:bg-card shadow-lg"
+                            onClick={handleFetchTimings}
+                            disabled={isLoadingTimings}
+                            className="w-full rounded-2xl py-6 font-black tracking-widest text-xs bg-secondary text-secondary-foreground hover:bg-card shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            <Clock className="w-4 h-4 mr-2" /> GET TIMINGS
+                            {isLoadingTimings ? <Clock className="w-4 h-4 mr-2 animate-spin" /> : <Clock className="w-4 h-4 mr-2" />}
+                            {isLoadingTimings ? 'FETCHING...' : 'GET TIMINGS'}
                         </Button>
                     </div>
                 </Card>
@@ -282,6 +305,13 @@ export const Settings: React.FC = () => {
                     </div>
                 </div>
             </Modal>
-        </div>
+
+            <Toast
+                message={toastState.message}
+                type={toastState.type}
+                isVisible={toastState.visible}
+                onClose={() => setToastState({ ...toastState, visible: false })}
+            />
+        </div >
     );
 };
