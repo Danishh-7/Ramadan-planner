@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
   experimental: {
-    allowedDevOrigins: ["localhost:3000", "172.16.2.55:3000"],
+    // allowedDevOrigins: ["localhost:3000", "172.16.2.55:3000"],
   },
 };
 

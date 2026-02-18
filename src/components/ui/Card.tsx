@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface CardProps {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     className?: string;
     hover?: boolean;
@@ -14,6 +14,7 @@ export const Card: React.FC<CardProps> = ({
     hover = false,
     glow = false,
     glass = false,
+    ...props
 }) => {
     const glassClass = glass === 'dark' ? 'glass-dark' : glass ? 'glass-morphism' : '';
 
@@ -26,6 +27,7 @@ export const Card: React.FC<CardProps> = ({
         ${glow ? 'glow-primary' : ''}
         ${className}
       `}
+            {...props}
         >
             {children}
         </div>
