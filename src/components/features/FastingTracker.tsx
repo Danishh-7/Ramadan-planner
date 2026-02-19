@@ -77,6 +77,14 @@ export const FastingTracker: React.FC = () => {
                     );
                 })}
             </div>
+
+            {/* Color Legend */}
+            <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 pt-4">
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-completed"></div>Fasted</div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-missed"></div>Missed</div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-qadha"></div>Excused</div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-muted/20 border border-border"></div>Not Started</div>
+            </div>
         </div >
     );
 };

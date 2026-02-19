@@ -4,12 +4,11 @@ import React, { useMemo } from 'react';
 import { useRamadanStore, DailyPrayers } from '@/store/store';
 
 export const ProgressHeart: React.FC = () => {
-    const { prayers, fasting, dailyPages, currentDay } = useRamadanStore();
+    const { prayers, fasting, currentDay } = useRamadanStore();
 
     const getDailyProgress = (day: number) => {
         const dayPrayers = prayers[day];
         const dayFasting = fasting[day];
-        const dayPages = dailyPages[day] || 0;
 
         let completedTasks = 0;
         if (dayPrayers) {
@@ -18,10 +17,9 @@ export const ProgressHeart: React.FC = () => {
                 if (dayPrayers[key] === 'completed') completedTasks++;
             });
         }
-        if (dayFasting === 'completed') completedTasks++;
-        if (dayPages > 0) completedTasks++;
+        if (dayFasting === 'completed' || dayFasting === 'excused') completedTasks++;
 
-        return (completedTasks / 7) * 100;
+        return (completedTasks / 6) * 100;
     };
 
     const singleHeartColor = '#FF5252'; // Consistent coral red color for all hearts
@@ -79,7 +77,7 @@ export const ProgressHeart: React.FC = () => {
         }
 
         return beads;
-    }, [currentDay, prayers, fasting, dailyPages]);
+    }, [currentDay, prayers, fasting]);
 
 
     // Calculate current day from start date
@@ -109,132 +107,132 @@ export const ProgressHeart: React.FC = () => {
     }
 
     return (
-       <>
-        <div className="relative w-full aspect-square max-w-[400px] mx-auto flex flex-col items-center justify-center p-6 overflow-hidden group">
-            {/* Creative Title */}
-            <div className="absolute top-4 left-0 w-full flex flex-col items-center justify-center z-10 pointer-events-none">
-                <h3 className="text-2xl font-black italic tracking-tighter text-foreground opacity-20 uppercase">Ramadan</h3>
-                <div className="h-[2px] w-12 bg-secondary/30 -mt-1 mb-1" />
-                <h2 className="text-4xl font-black italic tracking-tighter gradient-text underline decoration-secondary/30 decoration-2 underline-offset-4">JOURNEY</h2>
-            </div>
+        <>
+            <div className="relative w-full aspect-square max-w-[400px] mx-auto flex flex-col items-center justify-center p-6 overflow-hidden group">
+                {/* Creative Title */}
+                <div className="absolute top-4 left-0 w-full flex flex-col items-center justify-center z-10 pointer-events-none">
+                    <h3 className="text-2xl font-black italic tracking-tighter text-foreground opacity-20 uppercase">Ramadan</h3>
+                    <div className="h-[2px] w-12 bg-secondary/30 -mt-1 mb-1" />
+                    <h2 className="text-4xl font-black italic tracking-tighter gradient-text underline decoration-secondary/30 decoration-2 underline-offset-4">JOURNEY</h2>
+                </div>
 
-            <div className="flex-1 relative flex items-center justify-center w-full h-full mt-12">
-                <svg viewBox="0 0 500 500" className="w-full h-full drop-shadow-xl">
-                    <defs>
-                        {heartBeads.map((b) => (
-                            <linearGradient key={`grad-${b.day}`} id={`fill-${b.day}`} x1="0" y1="1" x2="0" y2="0">
-                                <stop offset={`${b.progress}%`} stopColor={b.color} />
-                                <stop offset={`${b.progress}%`} stopColor="white" />
-                            </linearGradient>
-                        ))}
-                        <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="4" result="blur" />
-                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                        </filter>
-                        <filter id="drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-                            <feOffset dx="0" dy="2" result="offsetblur" />
-                            <feComponentTransfer>
-                                <feFuncA type="linear" slope="0.3" />
-                            </feComponentTransfer>
-                            <feMerge>
-                                <feMergeNode />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                    </defs>
+                <div className="flex-1 relative flex items-center justify-center w-full h-full mt-12">
+                    <svg viewBox="0 0 500 500" className="w-full h-full drop-shadow-xl">
+                        <defs>
+                            {heartBeads.map((b) => (
+                                <linearGradient key={`grad-${b.day}`} id={`fill-${b.day}`} x1="0" y1="1" x2="0" y2="0">
+                                    <stop offset={`${b.progress}%`} stopColor={b.color} />
+                                    <stop offset={`${b.progress}%`} stopColor="white" />
+                                </linearGradient>
+                            ))}
+                            <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                            <filter id="drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+                                <feOffset dx="0" dy="2" result="offsetblur" />
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.3" />
+                                </feComponentTransfer>
+                                <feMerge>
+                                    <feMergeNode />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
 
-                    {/* Clean background */}
-                    <rect width="500" height="500" fill="transparent" />
+                        {/* Clean background */}
+                        <rect width="500" height="500" fill="transparent" />
 
-                    {heartBeads.map((b) => {
-                        const isFuture = b.day > calculatedCurrentDay;
-                        const isPast = b.day < calculatedCurrentDay;
-                        const isToday = b.day === calculatedCurrentDay;
-                        const radius = isToday ? 24 : 20;
+                        {heartBeads.map((b) => {
+                            const isFuture = b.day > calculatedCurrentDay;
+                            const isPast = b.day < calculatedCurrentDay;
+                            const isToday = b.day === calculatedCurrentDay;
+                            const radius = isToday ? 24 : 20;
 
-                        // Past/Future: Locked (no pointer events, specific styling)
-                        // Present: Unlocked (pointer events, onClick)
+                            // Past/Future: Locked (no pointer events, specific styling)
+                            // Present: Unlocked (pointer events, onClick)
 
-                        return (
-                            <g
-                                key={b.day}
-                                onClick={() => {
-                                    if (isToday) {
-                                        useRamadanStore.getState().setCurrentDay(b.day);
-                                    }
-                                }}
-                                className={`transition-all duration-300 ease-in-out ${isToday ? 'cursor-pointer hover:scale-110' : 'cursor-not-allowed opacity-60'}`}
-                                style={{ transformOrigin: `${b.x}px ${b.y}px` }}
-                            >
-                                {/* Main Bead with shadow filter */}
-                                <circle
-                                    cx={b.x}
-                                    cy={b.y}
-                                    r={radius}
-                                    fill={isFuture ? 'white' : `url(#fill-${b.day})`}
-                                    filter="url(#drop-shadow)"
-                                />
-
-                                {/* Glow for today */}
-                                {isToday && (
+                            return (
+                                <g
+                                    key={b.day}
+                                    onClick={() => {
+                                        if (isToday) {
+                                            useRamadanStore.getState().setCurrentDay(b.day);
+                                        }
+                                    }}
+                                    className={`transition-all duration-300 ease-in-out ${isToday ? 'cursor-pointer hover:scale-110' : 'cursor-not-allowed opacity-60'}`}
+                                    style={{ transformOrigin: `${b.x}px ${b.y}px` }}
+                                >
+                                    {/* Main Bead with shadow filter */}
                                     <circle
                                         cx={b.x}
                                         cy={b.y}
-                                        r={radius + 5}
-                                        fill="none"
-                                        stroke={singleHeartColor}
-                                        strokeWidth={2}
-                                        strokeOpacity={0.4}
-                                        filter="url(#soft-glow)"
-                                        className="animate-pulse"
+                                        r={radius}
+                                        fill={isFuture ? 'white' : `url(#fill-${b.day})`}
+                                        filter="url(#drop-shadow)"
                                     />
-                                )}
 
-                                {/* Lock Icon for Past/Future if needed, or just visual distinction. 
+                                    {/* Glow for today */}
+                                    {isToday && (
+                                        <circle
+                                            cx={b.x}
+                                            cy={b.y}
+                                            r={radius + 5}
+                                            fill="none"
+                                            stroke={singleHeartColor}
+                                            strokeWidth={2}
+                                            strokeOpacity={0.4}
+                                            filter="url(#soft-glow)"
+                                            className="animate-pulse"
+                                        />
+                                    )}
+
+                                    {/* Lock Icon for Past/Future if needed, or just visual distinction. 
                                     User requested Past/Future locked. opacity-60 above helps. 
                                 */}
-                                {(isPast || isFuture) && (
-                                    <circle cx={b.x} cy={b.y} r={radius} fill="rgba(200,200,200,0.1)" />
-                                )}
+                                    {(isPast || isFuture) && (
+                                        <circle cx={b.x} cy={b.y} r={radius} fill="rgba(200,200,200,0.1)" />
+                                    )}
 
 
-                                {/* Day Number */}
-                                <text
-                                    x={b.x}
-                                    y={b.y + 0.5}
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className={`font-black pointer-events-none transition-colors duration-300 ${b.progress > 55 && !isFuture ? 'fill-white' : 'fill-[#3e2723]'
-                                        }`}
-                                    style={{ fontSize: isToday ? '15px' : '13px' }}
-                                >
-                                    {b.day}
-                                </text>
-                            </g>
-                        );
-                    })}
-                </svg>
+                                    {/* Day Number */}
+                                    <text
+                                        x={b.x}
+                                        y={b.y + 0.5}
+                                        textAnchor="middle"
+                                        dominantBaseline="middle"
+                                        className={`font-black pointer-events-none transition-colors duration-300 ${b.progress > 55 && !isFuture ? 'fill-white' : 'fill-[#3e2723]'
+                                            }`}
+                                        style={{ fontSize: isToday ? '15px' : '13px' }}
+                                    >
+                                        {b.day}
+                                    </text>
+                                </g>
+                            );
+                        })}
+                    </svg>
 
 
+
+                </div>
+                {/* Legend - Moved to a side or bottom area that doesn't overlap */}
 
             </div>
-            {/* Legend - Moved to a side or bottom area that doesn't overlap */}
-           
-        </div>
-        <div>
-            <div className='flex col justify-center items-center gap-3'>
-                 <div className="flex mt-2 items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-white opacity-60 shadow-md" />
-                    <span className="text-[8px] font-black uppercase tracking-widest ">Locked</span>
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                    <div className="w-3 h-3 rounded-full bg-red-400 shadow-lg animate-pulse" />
-                    <span className="text-[8px] font-black uppercase tracking-widest ">Active</span>
+            <div>
+                <div className='flex col justify-center items-center gap-3'>
+                    <div className="flex mt-2 items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-white opacity-60 shadow-md" />
+                        <span className="text-[8px] font-black uppercase tracking-widest ">Locked</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                        <div className="w-3 h-3 rounded-full bg-red-400 shadow-lg animate-pulse" />
+                        <span className="text-[8px] font-black uppercase tracking-widest ">Active</span>
+                    </div>
                 </div>
             </div>
-        </div>
-       </>
-       
+        </>
+
     );
 };

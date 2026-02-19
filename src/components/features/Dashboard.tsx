@@ -42,36 +42,55 @@ export const Dashboard: React.FC = () => {
         return { completedJuz, totalPages, percentage: (completedJuz / 30) * 100 };
     };
 
-    const calculateDailyCompletion = (day: number) => {
+    const isDayPerfect = (day: number) => {
         const dayPrayers = prayers[day];
-        if (!dayPrayers) return 0;
-        const prayerKeys: Array<keyof typeof dayPrayers> = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
-        const completedCount = prayerKeys.filter(p => dayPrayers[p as keyof typeof dayPrayers] === 'completed').length;
-        const fastingDone = fasting[day] === 'completed' || fasting[day] === 'excused';
-        const dayHabits = habits[day] || [];
-        const habitCompletedCount = dayHabits.filter(h => h.completed).length;
-        const dayTasks = tasks[day] || [];
-        const taskCompletedCount = dayTasks.filter(t => t.completed).length;
+        const fastingStatus = fasting[day];
 
-        const total = 6 + dayHabits.length + dayTasks.length;
-        const completed = completedCount + (fastingDone ? 1 : 0) + habitCompletedCount + taskCompletedCount;
+        // 1. Check Fasting
+        if (fastingStatus !== 'completed' && fastingStatus !== 'excused') return false;
 
-        return total > 0 ? (completed / total) : 0;
+        // 2. Check All 5 Prayers
+        if (!dayPrayers) return false;
+        const requiredPrayers: Array<keyof typeof dayPrayers> = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+        const allPrayersDone = requiredPrayers.every(p => dayPrayers[p as keyof typeof dayPrayers] === 'completed');
+
+        return allPrayersDone;
     };
 
     const calculateStreak = () => {
         let streak = 0;
-        for (let day = currentDay; day >= 1; day--) {
-            if (calculateDailyCompletion(day) >= 0.7) streak++;
+        // Check strict streak starting from current day (if completed) or yesterday
+        // If today is perfect, start from today. If not, check yesterday.
+        let checkDay = isDayPerfect(currentDay) ? currentDay : currentDay - 1;
+
+        for (let day = checkDay; day >= 1; day--) {
+            if (isDayPerfect(day)) streak++;
             else break;
         }
         return streak;
+    };
+
+    const calculateMaxStreak = () => {
+        let max = 0;
+        let current = 0;
+        for (let day = 1; day <= currentDay; day++) {
+            if (isDayPerfect(day)) {
+                current++;
+                max = Math.max(max, current);
+            } else {
+                current = 0;
+            }
+        }
+        // Also check if we can project forward or just historical? Usually historical up to today.
+        // If currentDay is perfect, it counts.
+        return max;
     };
 
     const prayerStats = calculatePrayerStats();
     const fastingStats = calculateFastingStats();
     const quranStats = calculateQuranStats();
     const currentStreak = calculateStreak();
+    const maxStreak = calculateMaxStreak();
     const overallProgress = Math.round((prayerStats.percentage + fastingStats.percentage + quranStats.percentage) / 3);
 
     return (
@@ -113,13 +132,13 @@ export const Dashboard: React.FC = () => {
                         </div>
                         <div className="bg-background border-2 border-border p-5 rounded-3xl space-y-1 shadow-md relative overflow-hidden h-32 flex flex-col justify-center">
                             <div className="absolute top-0 right-0 p-3 opacity-5">
-                                <Calendar className="w-12 h-12" />
+                                <Trophy className="w-12 h-12" />
                             </div>
                             <div className="flex items-center gap-2 opacity-60">
-                                <Calendar className="w-4 h-4 text-foreground" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Current</span>
+                                <Trophy className="w-4 h-4 text-foreground" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Best</span>
                             </div>
-                            <div className="text-3xl font-black text-foreground">{currentDay}<span className="text-xl opacity-30">/30</span></div>
+                            <div className="text-3xl font-black text-foreground">{maxStreak} Days</div>
                         </div>
                     </div>
                 </Card>

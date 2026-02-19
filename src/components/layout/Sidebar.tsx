@@ -15,7 +15,9 @@ import {
     Settings,
     Menu,
     X,
+    MessageSquare,
 } from 'lucide-react';
+import { FeedbackModal } from '../features/FeedbackModal';
 
 interface SidebarProps {
     currentView: string;
@@ -24,7 +26,7 @@ interface SidebarProps {
 
 const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'ramadan-tracker', label: 'Ramadan Tracker', icon: Calendar },
+    { id: 'ramadan-tracker', label: 'Daily Prayers', icon: Calendar },
     { id: 'quran-tracker', label: 'Quran Tracker', icon: BookOpen },
     { id: 'fasting-tracker', label: 'Fasting Tracker', icon: Heart },
     { id: 'challenge', label: '30-Day Challenge', icon: Trophy },
@@ -36,6 +38,7 @@ const menuItems = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
     return (
         <>
@@ -60,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                     <div className="flex flex-col items-center">
                         <h1 className="text-4xl font-black italic tracking-tighter text-foreground font-serif">Ramadan</h1>
                         <p className="text-[10px] uppercase font-black tracking-[0.4em] text-muted-foreground mt-1">
-                            PLANNER
+                            PLANNER 2026
                         </p>
                     </div>
                 </div>
@@ -94,10 +97,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                                 </li>
                             );
                         })}
+
+                        {/* Feedback Button */}
+                        <li>
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    setIsFeedbackOpen(true);
+                                }}
+                                className={`
+                      w-full flex items-center gap-4 px-5 py-3 rounded-2xl
+                      transition-all duration-300 font-bold group
+                      text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1
+                    `}
+                            >
+                                <MessageSquare className="w-5 h-5 transition-transform duration-300 group-hover:scale-110 text-foreground/70" />
+                                <span className="tracking-tight">Feedback</span>
+                            </button>
+                        </li>
                     </ul>
                 </nav>
 
                 <div className="p-6 border-t-2 border-dotted border-border/40 bg-muted/10">
+                    <p className="text-[12px] flex justify-center uppercase font-black tracking-[0.4em] text-muted-foreground mt-1 ml-3">
+                        Made by
+                    </p>
+                    <div className="flex justify-center text-[12px]">
+                        <a href="https://www.instagram.com/with.daniish/">with.daniish</a>
+                    </div>
                 </div>
             </aside>
 
@@ -107,6 +134,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
                     onClick={() => setIsOpen(false)}
                 />
             )}
+
+            <FeedbackModal
+                isOpen={isFeedbackOpen}
+                onClose={() => setIsFeedbackOpen(false)}
+            />
         </>
     );
 };

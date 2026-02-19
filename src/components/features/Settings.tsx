@@ -5,11 +5,12 @@ import { useRamadanStore } from '@/store/store';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
-import { Calendar as CalendarIcon, Bell, Plus, Clock, Volume2, Trash2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Bell, Plus, Clock, Volume2, Trash2, MessageSquare, Send } from 'lucide-react';
 import { useNotifications } from '../providers/NotificationProvider';
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { Toast } from '../ui/Toast';
 import { COUNTRIES, getCitiesForCountry } from '@/data/locations';
+import { FeedbackModal } from './FeedbackModal';
 
 export const Settings: React.FC = () => {
     const {
@@ -28,6 +29,8 @@ export const Settings: React.FC = () => {
     const [toastState, setToastState] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'loading' }>({
         visible: false, message: '', type: 'success'
     });
+
+
 
     // Local state for immediate UI updates (prevents API call on every keystroke)
     const [localCity, setLocalCity] = useState(userCity);
@@ -188,6 +191,9 @@ export const Settings: React.FC = () => {
                             <Bell className="w-6 h-6" />
                         </div>
                         <h3 className="text-xl font-black text-card-foreground">Reminders & Notifications</h3>
+                        <p className="text-xs text-muted-foreground font-bold italic px-1">
+                            (only for desktop)
+                        </p>
                     </div>
 
                     <div className="space-y-4">
