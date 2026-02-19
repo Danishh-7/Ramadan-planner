@@ -14,6 +14,7 @@ import { MealPlanner } from '@/components/features/MealPlanner';
 import { DuasSection } from '@/components/features/DuasSection';
 import { NotesSection } from '@/components/features/NotesSection';
 import { Settings } from '@/components/features/Settings';
+import { FeedbackView } from '@/components/features/FeedbackView';
 
 import { AuthSyncProvider } from "@/components/providers/AuthSyncProvider";
 
@@ -51,6 +52,8 @@ export default function Home() {
         return <NotesSection />;
       case 'settings':
         return <Settings />;
+      case 'feedback':
+        return <FeedbackView />;
       default:
         return <Dashboard />;
     }
