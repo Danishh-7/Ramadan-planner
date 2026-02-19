@@ -45,6 +45,26 @@ export const RamadanTracker: React.FC = () => {
         return null;
     };
 
+    const calculateDailyProgress = () => {
+        // 1. Prayers
+        const requiredPrayers = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'taraweeh'];
+
+        // Simple Count Approach:
+        // Total Items = 6 (Prayers) + 1 (Challenge) + N (Tasks)
+        const totalItems = 6 + 1 + dayTasks.length;
+        let completedItems = 0;
+
+        requiredPrayers.forEach(p => {
+            if (dayPrayers[p as keyof DailyPrayers] === 'completed') completedItems++;
+        });
+
+        if (dayChallenge?.completed) completedItems++;
+
+        dayTasks.forEach(t => { if (t.completed) completedItems++; });
+
+        return totalItems === 0 ? 0 : (completedItems / totalItems) * 100;
+    };
+
     const handleAddTask = (e: React.FormEvent) => {
         e.preventDefault();
         if (newTask.trim()) {
@@ -70,8 +90,18 @@ export const RamadanTracker: React.FC = () => {
 
                 {dayChallenge && (
                     <div className="flex-1 w-full md:w-auto bg-[#4a342e] text-[#fdfcf0] p-4 rounded-2xl flex items-center gap-4 shadow-lg transform transition-all hover:scale-[1.02]">
-                        <div className="p-3 bg-white/10 rounded-full animate-pulse">
-                            <Trophy className="w-6 h-6 text-secondary" />
+                        <div className="relative w-12 h-12 flex items-center justify-center">
+                            {/* Heart Progress Background */}
+                            <svg viewBox="0 0 24 24" className="w-full h-full text-white/20 absolute">
+                                <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            {/* Heart Progress Fill (Dynamic Height) */}
+                            <div className="absolute inset-0 flex items-end justify-center overflow-hidden">
+                                <svg viewBox="0 0 24 24" className="w-full h-full text-red-500" style={{ clipPath: `inset(${100 - calculateDailyProgress()}% 0 0 0)` }}>
+                                    <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                </svg>
+                            </div>
+                            <span className="relative z-10 text-[10px] font-bold">{Math.round(calculateDailyProgress())}%</span>
                         </div>
                         <div>
                             <div className="text-[10px] font-black uppercase tracking-widest opacity-70">Daily Challenge</div>

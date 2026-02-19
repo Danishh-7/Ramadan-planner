@@ -12,3 +12,18 @@ export const supabase = createClient(
     supabaseUrl || '',
     supabaseAnonKey || ''
 );
+
+// Helper to create an authenticated client with Clerk token
+export const createClientWithToken = (token: string) => {
+    return createClient(
+        supabaseUrl || '',
+        supabaseAnonKey || '',
+        {
+            global: {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        }
+    );
+};
