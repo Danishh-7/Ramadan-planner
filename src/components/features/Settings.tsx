@@ -23,46 +23,11 @@ export const Settings: React.FC = () => {
     const [showAddAlarm, setShowAddAlarm] = useState(false);
     const [newAlarm, setNewAlarm] = useState({ type: 'General', time: '05:00', day: 1 });
 
-    // ... (previous code)
-
     // UI Loading & Toast States
     const [isLoadingTimings, setIsLoadingTimings] = useState(false);
     const [toastState, setToastState] = useState<{ visible: boolean; message: string; type: 'success' | 'error' | 'loading' }>({
         visible: false, message: '', type: 'success'
     });
-
-    // Manual Date Selection State
-    const [showResetModal, setShowResetModal] = useState(false);
-    const [pendingDate, setPendingDate] = useState<string | null>(null);
-    const [confirmationStep, setConfirmationStep] = useState<1 | 2>(1);
-
-    const handleDateChangeAttempt = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPendingDate(e.target.value);
-        setConfirmationStep(1);
-        setShowResetModal(true);
-    };
-
-    const confirmDateChange = () => {
-        if (confirmationStep === 1) {
-            setConfirmationStep(2);
-        } else {
-            if (pendingDate) {
-                setRamadanStartDate(pendingDate);
-                // Force a sync immediately after setting
-                useRamadanStore.getState().syncRamadanDay();
-                setToastState({ visible: true, message: 'Ramadan Start Date updated successfully.', type: 'success' });
-            }
-            setShowResetModal(false);
-            setPendingDate(null);
-            setConfirmationStep(1);
-        }
-    };
-
-    const cancelDateChange = () => {
-        setShowResetModal(false);
-        setPendingDate(null);
-        setConfirmationStep(1);
-    };
 
     // Local state for immediate UI updates (prevents API call on every keystroke)
     const [localCity, setLocalCity] = useState(userCity);
@@ -125,16 +90,46 @@ export const Settings: React.FC = () => {
         }
     };
 
+
+    // State for Date Change Modal
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [pendingDate, setPendingDate] = useState<string | null>(null);
+    const [confirmationStep, setConfirmationStep] = useState<1 | 2>(1);
+
+    const handleDateChangeAttempt = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPendingDate(e.target.value);
+        setConfirmationStep(1);
+        setShowResetModal(true);
+    };
+
+    const confirmDateChange = () => {
+        if (confirmationStep === 1) {
+            setConfirmationStep(2);
+        } else {
+            if (pendingDate) {
+                setRamadanStartDate(pendingDate);
+                // Force a sync immediately after setting
+                useRamadanStore.getState().syncRamadanDay();
+                setToastState({ visible: true, message: 'Ramadan Start Date updated successfully.', type: 'success' });
+            }
+            setShowResetModal(false);
+            setPendingDate(null);
+            setConfirmationStep(1);
+        }
+    };
+
+    const cancelDateChange = () => {
+        setShowResetModal(false);
+        setPendingDate(null);
+        setConfirmationStep(1);
+    };
+
     return (
         <div className="space-y-8 animate-fade-in pb-12 overflow-hidden font-serif">
-            <div className="text-center mb-8">
-                <h1 className="text-4xl font-extrabold gradient-text mb-2">Settings</h1>
-                <p className="text-muted-foreground font-medium italic">Configure your spiritual environment</p>
-            </div>
+            {/* ... (Header) */}
 
             {/* Ramadan Configuration */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                 <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-3 bg-primary/10 rounded-2xl text-primary">
@@ -149,7 +144,7 @@ export const Settings: React.FC = () => {
                         type="date"
                         value={ramadanStartDate}
                         onChange={handleDateChangeAttempt}
-                        className="w-full px-5 py-4 rounded-2xl border-2 border-black dark:border-white [color-scheme:light] dark:[color-scheme:dark] bg-background  focus:outline-none font-black  shadow-inner cursor-pointer"
+                        className="w-full px-5 py-4 rounded-2xl border-2 border-black dark:border-white dark:[color-scheme:dark] bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner cursor-pointer"
                     />
                     <p className="text-xs text-secondary font-bold italic px-1">
                         * Defaulted to {userCountry}. Click to change manually.

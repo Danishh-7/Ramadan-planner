@@ -31,7 +31,7 @@ export const Dashboard: React.FC = () => {
     const calculateFastingStats = () => {
         let completed = 0;
         for (let day = 1; day <= currentDay; day++) {
-            if (fasting[day] === 'completed') completed++;
+            if (fasting[day] === 'completed' || fasting[day] === 'excused') completed++;
         }
         return { completed, total: currentDay, percentage: currentDay > 0 ? (completed / currentDay) * 100 : 0 };
     };
@@ -47,7 +47,7 @@ export const Dashboard: React.FC = () => {
         if (!dayPrayers) return 0;
         const prayerKeys: Array<keyof typeof dayPrayers> = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
         const completedCount = prayerKeys.filter(p => dayPrayers[p as keyof typeof dayPrayers] === 'completed').length;
-        const fastingDone = fasting[day] === 'completed';
+        const fastingDone = fasting[day] === 'completed' || fasting[day] === 'excused';
         const dayHabits = habits[day] || [];
         const habitCompletedCount = dayHabits.filter(h => h.completed).length;
         const dayTasks = tasks[day] || [];

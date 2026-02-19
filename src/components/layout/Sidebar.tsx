@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
         <>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-white rounded-lg shadow-lg"
+                className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-primary text-white rounded-lg shadow-lg"
             >
                 {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
             <aside
                 className={`
           fixed lg:sticky top-0 left-0 h-screen bg-background border-r-2 border-dashed border-border/40
-          w-72 flex flex-col z-40 transition-transform duration-300
+          w-72 flex flex-col z-50 transition-transform duration-300
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
             >

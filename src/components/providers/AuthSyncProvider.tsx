@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser, useAuth } from '@clerk/nextjs';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRamadanStore } from '@/store/store';
 import { supabase, createClientWithToken } from '@/services/supabaseClient';
 
@@ -9,6 +9,10 @@ export function AuthSyncProvider() {
     const { user, isLoaded } = useUser();
     const { getToken } = useAuth();
     const { importData, exportData } = useRamadanStore();
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    // Flag to prevent loop: Import -> State Change -> Subscribe -> Upsert -> Import...
+    const isRemoteUpdate = useRef(false);
 
     useEffect(() => {
         if (!isLoaded || !user) return;
@@ -16,25 +20,23 @@ export function AuthSyncProvider() {
         const getAuthenticatedClient = async () => {
             try {
                 const token = await getToken({ template: 'supabase' });
-                if (token) {
-                    return createClientWithToken(token);
+                if (!token) {
+                    console.warn('⚠️ No Supabase token found. Check Clerk Dashboard -> JWT Templates.');
+                    return supabase;
                 }
-                console.warn('Supabase token missing. Ensure Clerk-Supabase integration is set up.');
-                return supabase;
+                return createClientWithToken(token);
             } catch (e: any) {
-                if (e.errors?.[0]?.code === 'resource_not_found') {
-                    console.error('CRITICAL: Clerk JWT Template "supabase" is missing.');
-                    console.error('Please go to Clerk Dashboard -> Integrations -> Add Supabase -> Token Template Name: "supabase"');
-                } else {
-                    console.error('Error fetching Supabase token:', e);
-                }
+                console.error('❌ Error getting Supabase token:', e);
                 return supabase;
             }
         };
 
-        // 1. Initial Sync (Pull from DB)
+        // 1. Initial Sync (Pull from DB) - user_settings table
         const fetchRemoteData = async () => {
+            setIsSyncing(true);
             const client = await getAuthenticatedClient();
+
+            console.log('Fetching remote data for user:', user.id);
 
             const { data: remoteData, error } = await client
                 .from('user_settings')
@@ -43,50 +45,39 @@ export function AuthSyncProvider() {
                 .single();
 
             if (error) {
-                console.error('Error fetching remote data:', error.message);
-                return;
-            }
-
-            if (remoteData?.data) {
-                console.log('Syncing data from Supabase...');
+                // PGRST116 is "The result contains 0 rows" - safe to ignore for new users
+                if (error.code !== 'PGRST116') {
+                    console.error('❌ Error fetching remote data:', error.message);
+                } else {
+                    console.log('ℹ️ No existing data found (New User). Uploading strictly local data.');
+                    // Optional: Create initial record
+                }
+            } else if (remoteData?.data) {
+                console.log('✅ Syncing data from Supabase...');
+                isRemoteUpdate.current = true;
                 importData(JSON.stringify(remoteData.data));
+
+                // Reset flag after a short delay
+                setTimeout(() => { isRemoteUpdate.current = false; }, 500);
             }
+            setIsSyncing(false);
         };
 
         fetchRemoteData();
 
-        // 2. Real-time Subscription (Listen for changes from other devices)
-        const channel = supabase
-            .channel('user_settings_changes')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'user_settings',
-                    filter: `id=eq.${user.id}`,
-                },
-                (payload) => {
-                    console.log('Real-time update received:', payload);
-                    if (payload.new && payload.new.data) {
-                        // Prevent loop: Only import if data is different? 
-                        // For now, straightforward import. Store might re-trigger subscriber but debounce handles it.
-                        // Ideally checking a timestamp would be better, but this works for basic sync.
-                        importData(JSON.stringify(payload.new.data));
-                        console.log('🔄 Data synced from cloud');
-                    }
-                }
-            )
-            .subscribe();
-
-        // 3. Push to DB on change (Debounced)
+        // 2. Auto-Save Subscription (Debounced)
         let timeout: NodeJS.Timeout;
 
         const unsubscribe = useRamadanStore.subscribe((state) => {
+            // If this change was caused by a remote import, DO NOT push it back
+            if (isRemoteUpdate.current) return;
+
             clearTimeout(timeout);
             timeout = setTimeout(async () => {
+                if (!user) return;
+
+                setIsSyncing(true);
                 const client = await getAuthenticatedClient();
-                // console.log('Auto-syncing to Supabase...'); // Reduce noise
                 const dataToSave = JSON.parse(exportData());
 
                 const { error } = await client
@@ -99,19 +90,20 @@ export function AuthSyncProvider() {
                     });
 
                 if (error) {
-                    console.error('Sync failed:', error.message);
+                    console.error('❌ Auto-save failed:', error.message);
                 } else {
-                    console.log('✅ Data synced to Supabase');
+                    console.log('✅ Auto-saved to Supabase');
                 }
+                setIsSyncing(false);
             }, 2000); // 2 second debounce
         });
 
         return () => {
             unsubscribe();
             clearTimeout(timeout);
-            supabase.removeChannel(channel);
         };
-    }, [isLoaded, user, importData, exportData, getToken]);
+    }, [isLoaded, user, getToken, importData, exportData]);
 
+    // Optional: Visual indicator (toast or small icon) handled by UI components via isSyncing state
     return null;
 }

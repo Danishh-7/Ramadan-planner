@@ -31,28 +31,21 @@ export const FastingTracker: React.FC = () => {
                     return (
                         <Card
                             key={day}
-                            className={`p-4 rounded-[2rem] notebook-border text-center space-y-3 transition-all shadow-md ${isFuture ? 'opacity-30 bg-white/50' : 'hover:scale-105 bg-white'} ${currentStatus ? `shadow-lg border-${currentStatus.bg}` : ''}`}
+                            className={`p-4 rounded-[2rem] notebook-border text-center space-y-3 transition-all shadow-md 
+                                ${day === currentDay ? 'bg-card border-2 border-primary shadow-xl scale-105' : ''}
+                                ${isFuture && day > (currentDay + 5) ? 'opacity-30 bg-muted/20' : 'hover:scale-105 bg-card'} 
+                                ${currentStatus ? `shadow-lg border-${currentStatus.bg}` : ''}`}
                         >
                             <div className="text-sm font-black text-[#8d6e63] uppercase opacity-60">Day {day}</div>
                             <div className={`w-12 h-12 mx-auto rounded-2xl flex items-center justify-center transition-all ${currentStatus ? `${currentStatus.bg} text-white shadow-lg` : 'bg-[#fdfcf0] text-muted-foreground border-2 border-dashed border-border'}`}>
                                 {currentStatus ? <currentStatus.icon className="w-6 h-6" /> : <Heart className="w-6 h-6 opacity-40" />}
                             </div>
 
-                            {/* STRICT LOCKING: Only show controls if day === realTimeDay */}
+                            {/* Simplified Locking: Based on store's currentDay */}
                             {(() => {
-                                const todayDate = new Date();
-                                todayDate.setHours(0, 0, 0, 0);
-                                const startDate = new Date(useRamadanStore.getState().ramadanStartDate);
-                                startDate.setHours(0, 0, 0, 0);
-                                const diffTime = Math.abs(todayDate.getTime() - startDate.getTime());
-                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                                const realTimeDay = diffDays > 30 ? 30 : diffDays < 1 ? 1 : diffDays;
+                                const isLocked = day > currentDay; // Only lock future days
 
-                                const isFuture = day > realTimeDay;
-                                const isPast = day < realTimeDay;
-                                const isLocked = isFuture || isPast;
-
-                                if (isFuture) return <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest pt-4 pb-2">Locked</div>;
+                                if (isLocked) return <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest pt-4 pb-2">Locked</div>;
 
                                 return (
                                     <div className="flex flex-col gap-1 pt-2">
@@ -63,13 +56,13 @@ export const FastingTracker: React.FC = () => {
                                                 onClick={() => updateFastingStatus(day, s.value)}
                                                 className={`text-[10px] font-black uppercase tracking-widest py-1.5 rounded-lg transition-all 
                                                     ${status === s.value ? `${s.bg} text-white shadow-sm` : 'bg-muted/10 text-muted-foreground'} 
-                                                    ${!isLocked ? 'hover:bg-muted' : 'cursor-not-allowed opacity-80'}
+                                                    hover:bg-muted
                                                 `}
                                             >
                                                 {s.label}
                                             </button>
                                         ))}
-                                        {status && !isLocked && (
+                                        {status && (
                                             <button
                                                 onClick={() => updateFastingStatus(day, null)}
                                                 className="text-[10px] font-black text-missed/60 hover:text-missed mt-1 p-1 uppercase tracking-tighter"

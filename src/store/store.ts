@@ -172,7 +172,7 @@ interface RamadanStore {
     resetAllData: () => void;
     exportData: () => string;
     importData: (json: string) => void;
-
+    syncWithSupabase: (userId: string) => Promise<void>;
 }
 
 const defaultPrayers: DailyPrayers = {
@@ -273,7 +273,8 @@ export const useRamadanStore = create<RamadanStore>()(
                 // Prioritize coordinates if available
                 const timings = await getSehriIftarTimings(userCity, userCountry, latitude || undefined, longitude || undefined);
 
-                // Timings fetched successfully
+                // Timings fetched successfully - notifications or other logic can go here
+                // We no longer overwrite 'meals' with timings as that is for user text input
             },
 
             updatePrayerStatus: (day, prayer, status) => {
@@ -375,8 +376,25 @@ export const useRamadanStore = create<RamadanStore>()(
                 } catch (e) { console.error('Import failed', e); }
             },
 
+            syncWithSupabase: async (userId: string) => {
+                const { exportData } = get();
+                // Simple debounce or just fire and forget - ideally use a library or custom debounce
+                // For now, we'll just upsert
+                const { supabase } = await import('@/services/supabaseClient');
 
+                try {
+                    await supabase
+                        .from('user_settings')
+                        .upsert({
+                            user_id: userId,
+                            data: JSON.parse(exportData()),
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' });
+                } catch (error) {
+                    console.error('Error syncing to Supabase:', error);
+                }
+            },
         }),
-        { name: 'ramadan-planner-storage-v2' }
+        { name: 'ramadan-planner-storage' }
     )
 );
