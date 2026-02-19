@@ -10,7 +10,7 @@ import { useNotifications } from '../providers/NotificationProvider';
 import { SearchableSelect } from '../ui/SearchableSelect';
 import { Toast } from '../ui/Toast';
 import { COUNTRIES, getCitiesForCountry } from '@/data/locations';
-import { FeedbackModal } from './FeedbackModal';
+
 
 export const Settings: React.FC = () => {
     const {

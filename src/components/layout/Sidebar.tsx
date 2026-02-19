@@ -17,7 +17,7 @@ import {
     X,
     MessageSquare,
 } from 'lucide-react';
-import { FeedbackModal } from '../features/FeedbackModal';
+
 
 interface SidebarProps {
     currentView: string;
