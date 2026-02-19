@@ -31,7 +31,7 @@ export const Header: React.FC = () => {
         <header className="sticky top-0 z-30 bg-card/70 border-b border-border/40 backdrop-blur-xl">
             <div className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5">
                 {/* Current Day Info */}
-                <div className="flex items-center gap-4 md:gap-6 ml-12 ">
+                <div className="flex items-center gap-4 md:gap-6 ml-2 ml-12 md:ml-12 lg:ml-1">
                     <div className="relative group shrink-0">
                         <div className="absolute -inset-1 bg-gradient-to-br from-[#8E7C68] to-[#5D4037] rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                         <div className="relative flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#8E7C68] to-[#5D4037] text-[#FDFCF0] shadow-xl transform transition hover:scale-105 duration-300">
