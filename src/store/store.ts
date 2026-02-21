@@ -31,6 +31,8 @@ export interface Challenge {
     day: number;
     task: string;
     completed: boolean;
+    points: number;
+    isMystery: boolean;
 }
 
 export interface Dua {
@@ -100,6 +102,11 @@ interface RamadanStore {
     duas: Dua[];
     notes: Note[];
     alarms: Alarm[];
+
+    // Gamification
+    hasanatPoints: number;
+    currentStreak: number;
+    completedChallengeDays: number[]; // Record days successfully completed to compute streak
 
     // Quran Tracking
     quranBookmark: QuranBookmark;
@@ -184,8 +191,46 @@ const defaultDuas: Dua[] = [
     { id: '3', title: 'Dua for Laylatul Qadr', arabic: 'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي', transliteration: 'Allahumma innaka...', translation: 'O Allah, You are Forgiving...', isCustom: false, isFavorite: false, isHighlighted: true },
 ];
 
+const prefilledTasks = [
+    "Donate money to a charity",
+    "Learn a new dua",
+    "Read a story of our prophets",
+    "Pray an extra sunnah prayer",
+    "Listen to an Islamic podcast",
+    "Memorize a short Surah",
+    "Visit someone who is ill",
+    "Give up a bad habit for the day",
+    "Do extra Dhikr after prayers",
+    "Pray Tahajjud tonight",
+    "Read 5 pages of the Quran with translation",
+    "Help your family with Iftar prep",
+    "Share food with a neighbor or the needy",
+    "Make heartfelt Dua for your parents",
+    "Visit the mosque for congregational prayer",
+    "Read a book on Islamic History",
+    "Learn the meaning of your favorite Ayah",
+    "Reach out to reunite with an old friend",
+    "Listen to a full Surah recitation",
+    "Perform a random act of kindness",
+    "Sponsor an orphan or feed a fasting person",
+    "Learn the 99 Names of Allah (Al Asma Ul Husna)",
+    "Avoid backbiting, gossip, and arguments all day",
+    "Spend 15 minutes contemplating in silence",
+    "Do 100x Istighfar (seeking forgiveness)",
+    "Clean the mosque or your local prayer area",
+    "Forgive someone in your heart who wronged you",
+    "Write down 5 things you are grateful for today",
+    "Pray 20 rakat Taraweeh",
+    "Make a grand, heartfelt Dua for the entire Ummah"
+];
+
 const defaultChallenges: Challenge[] = Array.from({ length: 30 }, (_, i) => ({
-    id: (i + 1).toString(), day: i + 1, task: `Day ${i + 1} Challenge`, completed: false
+    id: (i + 1).toString(),
+    day: i + 1,
+    task: prefilledTasks[i],
+    completed: false,
+    points: (i + 1) % 5 === 0 ? 50 : 10, // Mystery days every 5 days
+    isMystery: (i + 1) % 5 === 0
 }));
 
 export const useRamadanStore = create<RamadanStore>()(
@@ -208,6 +253,9 @@ export const useRamadanStore = create<RamadanStore>()(
             duas: defaultDuas,
             notes: [],
             alarms: [],
+            hasanatPoints: 0,
+            currentStreak: 0,
+            completedChallengeDays: [],
             activeAlarm: null,
             selectedSound: 'beep',
             customSounds: [],
@@ -338,7 +386,50 @@ export const useRamadanStore = create<RamadanStore>()(
             toggleHabit: (day, habitId) => set((state) => ({ habits: { ...state.habits, [day]: (state.habits[day] || []).map(h => h.id === habitId ? { ...h, completed: !h.completed } : h) } })),
             deleteHabit: (day, habitId) => set((state) => ({ habits: { ...state.habits, [day]: (state.habits[day] || []).filter(h => h.id !== habitId) } })),
 
-            updateChallenge: (day, task, completed) => set((state) => ({ challenges: state.challenges.map(c => c.day === day ? { ...c, task, completed } : c) })),
+            updateChallenge: (day, task, completed) => set((state) => {
+                const challengeIndex = state.challenges.findIndex(c => c.day === day);
+                if (challengeIndex === -1) return state;
+
+                const challenge = state.challenges[challengeIndex];
+
+                // If checking it off
+                let newPoints = state.hasanatPoints;
+                let newCompletedDays = [...state.completedChallengeDays];
+
+                if (completed && !challenge.completed) {
+                    newPoints += challenge.points;
+                    if (!newCompletedDays.includes(day)) {
+                        newCompletedDays.push(day);
+                        newCompletedDays.sort((a, b) => a - b);
+                    }
+                } else if (!completed && challenge.completed) {
+                    newPoints -= challenge.points;
+                    newCompletedDays = newCompletedDays.filter(d => d !== day);
+                }
+
+                // Calculate simple streak (consecutive days leading up to last completed day)
+                let newStreak = 0;
+                if (newCompletedDays.length > 0) {
+                    newStreak = 1;
+                    for (let i = newCompletedDays.length - 1; i > 0; i--) {
+                        if (newCompletedDays[i] - newCompletedDays[i - 1] === 1) {
+                            newStreak++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                const newChallenges = [...state.challenges];
+                newChallenges[challengeIndex] = { ...challenge, task, completed };
+
+                return {
+                    challenges: newChallenges,
+                    hasanatPoints: Math.max(0, newPoints),
+                    currentStreak: newStreak,
+                    completedChallengeDays: newCompletedDays
+                };
+            }),
             updateChallengeText: (day, text) => set((state) => ({ challenges: state.challenges.map(c => c.day === day ? { ...c, task: text } : c) })),
 
             addDua: (dua) => set((state) => ({ duas: [...state.duas, { ...dua, id: Date.now().toString() }] })),
@@ -360,16 +451,39 @@ export const useRamadanStore = create<RamadanStore>()(
                 customSounds: [...state.customSounds, { id: Date.now().toString(), name, url }]
             })),
 
-            resetAllData: () => set({ prayers: {}, fasting: {}, tasks: {}, habits: {}, meals: {}, dailyPages: {}, juzCompleted: Array(30).fill(false), notes: [], alarms: [], activeAlarm: null, selectedSound: 'beep', customSounds: [] }),
+            resetAllData: () => set({ prayers: {}, fasting: {}, tasks: {}, habits: {}, meals: {}, dailyPages: {}, juzCompleted: Array(30).fill(false), notes: [], alarms: [], hasanatPoints: 0, currentStreak: 0, completedChallengeDays: [], activeAlarm: null, selectedSound: 'beep', customSounds: [] }),
             exportData: () => JSON.stringify(get(), null, 2),
             importData: (json) => {
                 try {
                     const data = JSON.parse(json);
+
+                    // Migration: Ensure old placeholder tasks are upgraded but completion state is preserved
+                    if (data.challenges && Array.isArray(data.challenges)) {
+                        const needsMigration = data.challenges.some((c: any) =>
+                            c.points === undefined ||
+                            c.isMystery === undefined ||
+                            (c.task.startsWith('Day ') && c.task.endsWith(' Challenge'))
+                        );
+
+                        if (needsMigration) {
+                            console.log('Migrating old challenge data from Supabase...');
+                            data.challenges = defaultChallenges.map((defaultChallenge, index) => {
+                                const oldChallenge = data.challenges[index];
+                                return {
+                                    ...defaultChallenge,
+                                    completed: oldChallenge ? oldChallenge.completed : false
+                                };
+                            });
+                        }
+                    }
+
                     set(data);
                     get().syncRamadanDay();
-                } catch (e) { console.error('Import failed', e); }
+                } catch (e) {
+                    console.error('Import failed', e);
+                }
             },
         }),
-        { name: 'ramadan-planner-storage' }
+        { name: 'ramadan-planner-v2' }
     )
 );
