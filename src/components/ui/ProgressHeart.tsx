@@ -80,15 +80,7 @@ export const ProgressHeart: React.FC = () => {
     }, [currentDay, prayers, fasting]);
 
 
-    // Calculate current day from start date
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const start = new Date(useRamadanStore.getState().ramadanStartDate);
-    start.setHours(0, 0, 0, 0);
-    const diffTime = Math.abs(today.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    // ensure within 1-30 range or appropriate logic
-    const calculatedCurrentDay = diffDays > 30 ? 30 : diffDays < 1 ? 1 : diffDays;
+    const calculatedCurrentDay = currentDay;
 
 
     // CLIENT-ONLY RENDERING to prevent hydration mismatches

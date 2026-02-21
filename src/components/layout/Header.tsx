@@ -19,7 +19,8 @@ export const Header: React.FC = () => {
     };
 
     const getCurrentDate = () => {
-        const startDate = new Date(ramadanStartDate);
+        const [year, month, day] = ramadanStartDate.split('T')[0].split('-').map(Number);
+        const startDate = new Date(year, month - 1, day);
         const currentDate = new Date(startDate);
         currentDate.setDate(startDate.getDate() + (currentDay - 1));
         return format(currentDate, 'MMMM dd, yyyy');
