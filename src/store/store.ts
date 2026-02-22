@@ -61,9 +61,20 @@ export interface Note {
     content: string;
 }
 
+import { DietaryGoal, HealthCondition, Region } from '@/data/mealsDB';
+
 export interface MealPlan {
-    suhoor: string;
-    iftar: string;
+    suhoor?: string;
+    iftar?: string;
+    suhoorIds?: string[];
+    iftarIds?: string[];
+    snackIds?: string[];
+}
+
+export interface DietaryProfile {
+    goal: DietaryGoal;
+    condition: HealthCondition;
+    region: Region;
 }
 
 export interface QuranBookmark {
@@ -108,6 +119,9 @@ interface RamadanStore {
     currentStreak: number;
     completedChallengeDays: number[]; // Record days successfully completed to compute streak
 
+    // Dietary
+    dietaryProfile: DietaryProfile;
+
     // Quran Tracking
     quranBookmark: QuranBookmark;
     quranCompletionCount: number;
@@ -124,6 +138,7 @@ interface RamadanStore {
     setTheme: (theme: 'light' | 'dark') => void;
     setNotificationsEnabled: (enabled: boolean) => void;
     setLocation: (city: string, country: string) => void;
+    updateDietaryProfile: (profile: Partial<DietaryProfile>) => void;
     fetchTimings: (day: number) => Promise<void>;
     syncRamadanDay: () => void;
     detectLocation: () => Promise<void>;
@@ -137,7 +152,9 @@ interface RamadanStore {
     // Activity Actions
     updatePrayerStatus: (day: number, prayer: keyof DailyPrayers, status: PrayerStatus | boolean) => void;
     updateFastingStatus: (day: number, status: FastingStatus) => void;
-    updateMeal: (day: number, type: 'suhoor' | 'iftar', meal: string) => void;
+    addFoodToMeal: (day: number, type: 'suhoor' | 'iftar' | 'snack', mealId: string) => void;
+    removeFoodFromMeal: (day: number, type: 'suhoor' | 'iftar' | 'snack', mealId: string) => void;
+    clearMeal: (day: number, type: 'suhoor' | 'iftar' | 'snack') => void;
     updateDailyPages: (day: number, pages: number) => void;
     updateChallengeText: (day: number, text: string) => void;
 
@@ -256,6 +273,7 @@ export const useRamadanStore = create<RamadanStore>()(
             hasanatPoints: 0,
             currentStreak: 0,
             completedChallengeDays: [],
+            dietaryProfile: { goal: 'maintenance', condition: 'none', region: 'desi' },
             activeAlarm: null,
             selectedSound: 'beep',
             customSounds: [],
@@ -268,6 +286,7 @@ export const useRamadanStore = create<RamadanStore>()(
             setTheme: (theme) => set({ theme }),
             setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
             setLocation: (city, country) => set({ userCity: city, userCountry: country }),
+            updateDietaryProfile: (profile) => set((state) => ({ dietaryProfile: { ...state.dietaryProfile, ...profile } })),
 
             syncRamadanDay: () => {
                 const { ramadanStartDate } = get();
@@ -326,8 +345,43 @@ export const useRamadanStore = create<RamadanStore>()(
                 set((state) => ({ fasting: { ...state.fasting, [day]: status } }));
             },
 
-            updateMeal: (day, type, meal) =>
-                set((state) => ({ meals: { ...state.meals, [day]: { ...(state.meals[day] || { suhoor: '', iftar: '' }), [type]: meal } } })),
+            addFoodToMeal: (day, type, mealId) =>
+                set((state) => {
+                    const currentDayMeals = state.meals[day] || {};
+                    const arrayName = `${type}Ids` as 'suhoorIds' | 'iftarIds' | 'snackIds';
+                    const currentIds = currentDayMeals[arrayName] || [];
+                    if (currentIds.includes(mealId)) return state;
+                    return {
+                        meals: {
+                            ...state.meals,
+                            [day]: { ...currentDayMeals, [arrayName]: [...currentIds, mealId] }
+                        }
+                    };
+                }),
+
+            removeFoodFromMeal: (day, type, mealId) =>
+                set((state) => {
+                    const currentDayMeals = state.meals[day] || {};
+                    const arrayName = `${type}Ids` as 'suhoorIds' | 'iftarIds' | 'snackIds';
+                    const currentIds = currentDayMeals[arrayName] || [];
+                    return {
+                        meals: {
+                            ...state.meals,
+                            [day]: { ...currentDayMeals, [arrayName]: currentIds.filter(id => id !== mealId) }
+                        }
+                    };
+                }),
+
+            clearMeal: (day, type) =>
+                set((state) => {
+                    const currentDayMeals = state.meals[day] || {};
+                    return {
+                        meals: {
+                            ...state.meals,
+                            [day]: { ...currentDayMeals, [`${type}Ids`]: [] }
+                        }
+                    };
+                }),
 
             updateDailyPages: (day, pages) =>
                 set((state) => ({ dailyPages: { ...state.dailyPages, [day]: Math.max(0, pages) } })),
@@ -451,7 +505,7 @@ export const useRamadanStore = create<RamadanStore>()(
                 customSounds: [...state.customSounds, { id: Date.now().toString(), name, url }]
             })),
 
-            resetAllData: () => set({ prayers: {}, fasting: {}, tasks: {}, habits: {}, meals: {}, dailyPages: {}, juzCompleted: Array(30).fill(false), notes: [], alarms: [], hasanatPoints: 0, currentStreak: 0, completedChallengeDays: [], activeAlarm: null, selectedSound: 'beep', customSounds: [] }),
+            resetAllData: () => set({ prayers: {}, fasting: {}, tasks: {}, habits: {}, meals: {}, dailyPages: {}, juzCompleted: Array(30).fill(false), notes: [], alarms: [], hasanatPoints: 0, currentStreak: 0, completedChallengeDays: [], activeAlarm: null, selectedSound: 'beep', customSounds: [], dietaryProfile: { goal: 'maintenance', condition: 'none', region: 'desi' } }),
             exportData: () => JSON.stringify(get(), null, 2),
             importData: (json) => {
                 try {
