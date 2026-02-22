@@ -18,6 +18,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AlarmOverlay } from "@/components/ui/AlarmOverlay";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
   children,
@@ -31,6 +32,7 @@ export default function RootLayout({
           <NotificationProvider>
             <ThemeProvider>
               {children}
+               <Analytics />
               <AlarmOverlay />
             </ThemeProvider>
           </NotificationProvider>
