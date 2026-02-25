@@ -135,8 +135,8 @@ export const Settings: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="flex flex-col gap-4 bg-card shadow-xl">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="p-3 bg-primary/10 rounded-2xl text-primary">
-                            <CalendarIcon className="w-6 h-6" />
+                        <div className="p-3 bg-primary/10 rounded-2xl">
+                            <CalendarIcon className="w-6 h-6 text-black dark:text-primary" />
                         </div>
                         <h3 className="text-xl font-black text-card-foreground">Ramadan Start Date</h3>
                     </div>
@@ -147,7 +147,17 @@ export const Settings: React.FC = () => {
                         type="date"
                         value={ramadanStartDate}
                         onChange={handleDateChangeAttempt}
-                        className="w-full px-5 py-4 rounded-2xl border-2 border-black dark:border-white dark:[color-scheme:dark] bg-background focus:border-primary focus:outline-none font-black text-foreground shadow-inner cursor-pointer"
+                        className="
+    w-full px-5 py-4 rounded-2xl
+    border-2 border-black dark:border-white
+    bg-white dark:bg-black
+    text-black dark:text-white
+    focus:border-primary focus:outline-none
+    font-black shadow-inner cursor-pointer
+    [color-scheme:light] dark:[color-scheme:dark]
+    [&::-webkit-calendar-picker-indicator]:invert
+    dark:[&::-webkit-calendar-picker-indicator]:invert-0
+  "
                     />
                     <p className="text-xs text-secondary font-bold italic px-1">
                         * Defaulted to {userCountry}. Click to change manually.

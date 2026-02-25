@@ -236,7 +236,7 @@ const defaultChallenges: Challenge[] = Array.from({ length: 30 }, (_, i) => ({
 export const useRamadanStore = create<RamadanStore>()(
     persist(
         (set, get) => ({
-            ramadanStartDate: new Date().toISOString().split('T')[0],
+            ramadanStartDate: '2026-02-19',
             currentDay: 1,
             theme: 'light',
             notificationsEnabled: true,
@@ -484,6 +484,16 @@ export const useRamadanStore = create<RamadanStore>()(
                 }
             },
         }),
-        { name: 'ramadan-planner-v2' }
+        {
+            name: 'ramadan-planner-v2',
+            version: 1,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            migrate: (persistedState: any, version: number) => {
+                if (version === 0) {
+                    persistedState.ramadanStartDate = '2026-02-19';
+                }
+                return persistedState;
+            }
+        }
     )
 );
