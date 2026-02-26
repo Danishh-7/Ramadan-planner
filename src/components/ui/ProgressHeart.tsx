@@ -25,7 +25,7 @@ export const ProgressHeart: React.FC = () => {
     const singleHeartColor = '#FF5252'; // Consistent coral red color for all hearts
 
     // Generate 30 stable positions in a heart shape
-    const heartBeads = useMemo(() => {
+    const { beads: heartBeads, innerHeartPath } = useMemo(() => {
         const totalPoints = 1000; // high resolution sampling
         const rawPoints: { x: number; y: number }[] = [];
 
@@ -56,6 +56,7 @@ export const ProgressHeart: React.FC = () => {
 
         // 3. Pick 30 evenly spaced points
         const beads = [];
+        const scale = 11;
         for (let i = 0; i < 30; i++) {
             const target = (i / 30) * totalLength;
 
@@ -66,7 +67,6 @@ export const ProgressHeart: React.FC = () => {
             const point = rawPoints[index];
 
             // scale and center
-            const scale = 11;
             beads.push({
                 x: 250 + point.x * scale,
                 y: 250 - point.y * scale, // invert y for correct orientation
@@ -76,7 +76,9 @@ export const ProgressHeart: React.FC = () => {
             });
         }
 
-        return beads;
+        const innerHeartPath = `M ${rawPoints.map(p => `${250 + p.x * scale},${250 - p.y * scale}`).join(' L ')} Z`;
+
+        return { beads, innerHeartPath };
     }, [currentDay, prayers, fasting]);
 
 
@@ -111,6 +113,9 @@ export const ProgressHeart: React.FC = () => {
                 <div className="flex-1 relative flex items-center justify-center w-full h-full mt-12">
                     <svg viewBox="0 0 500 500" className="w-full h-full drop-shadow-xl">
                         <defs>
+                            <clipPath id="heart-clip">
+                                <path d={innerHeartPath} />
+                            </clipPath>
                             {heartBeads.map((b) => (
                                 <linearGradient key={`grad-${b.day}`} id={`fill-${b.day}`} x1="0" y1="1" x2="0" y2="0">
                                     <stop offset={`${b.progress}%`} stopColor={b.color} />
@@ -136,6 +141,24 @@ export const ProgressHeart: React.FC = () => {
 
                         {/* Clean background */}
                         <rect width="500" height="500" fill="transparent" />
+
+                        {/* Inner filled heart with wave animation */}
+                        <g clipPath="url(#heart-clip)">
+                            <g style={{ transform: `translateY(${440 - (calculatedCurrentDay / 30) * 260}px)`, transition: 'transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+                                {/* Back wave (moving right) */}
+                                <path d="M -500 0 Q -375 -15 -250 0 T 0 0 T 250 0 T 500 0 T 750 0 T 1000 0 V 500 H -500 Z" fill={singleHeartColor} fillOpacity="0.4">
+                                    <animateTransform attributeName="transform" type="translate" from="0 0" to="500 0" dur="8s" repeatCount="indefinite" />
+                                </path>
+                                {/* Middle wave (moving left) */}
+                                <path d="M -500 0 Q -375 20 -250 0 T 0 0 T 250 0 T 500 0 T 750 0 T 1000 0 V 500 H -500 Z" fill={singleHeartColor} fillOpacity="0.5">
+                                    <animateTransform attributeName="transform" type="translate" from="0 0" to="-500 0" dur="6s" repeatCount="indefinite" />
+                                </path>
+                                {/* Front wave (moving right faster) */}
+                                <path d="M -500 10 Q -375 -10 -250 10 T 0 10 T 250 10 T 500 10 T 750 10 T 1000 10 V 500 H -500 Z" fill={singleHeartColor} fillOpacity="0.7">
+                                    <animateTransform attributeName="transform" type="translate" from="0 0" to="500 0" dur="4s" repeatCount="indefinite" />
+                                </path>
+                            </g>
+                        </g>
 
                         {heartBeads.map((b) => {
                             const isFuture = b.day > calculatedCurrentDay;
